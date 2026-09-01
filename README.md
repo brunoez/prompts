@@ -3,9 +3,9 @@
 <div align="center">
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/brunoez/prompts?color=blue)](https://github.com/brunoez/prompts/releases/latest)
 [![GitHub Stars](https://img.shields.io/github/stars/brunoez/prompts?style=social)](https://github.com/brunoez/prompts)
 [![GitLab CI](https://img.shields.io/badge/GitLab%20CI-Passing-22c55e?logo=gitlab)](.gitlab-ci.yml)
-[![PRs Welcome](https://img.shields.io/badge/PRs-Welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Language](https://img.shields.io/badge/Language-pt--BR-009c3b.svg)](README.md)
 
 **A biblioteca definitiva de prompts estruturados de auditoria profunda, arquitetura defensiva e metodologias *Driven Development* para desenvolvedores, arquitetos e agentes de Inteligência Artificial.**
@@ -26,15 +26,13 @@ O objetivo é transformar a velocidade do **Vibe Coding** em software de **níve
 
 ## ⚡ Instalação Rápida
 
-Você pode instalar a suíte de prompts em qualquer projeto com um único comando:
-
-Execute na raiz do seu projeto:
+Instale a suíte de prompts no seu projeto com um único comando:
 
 ```bash
 curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash
 ```
 
-> **Dica:** Por padrão, os prompts são instalados em `.agent/prompts/`. Se você usa **Cursor**, **Windsurf** ou deseja instalar para todas as ferramentas:
+> **Dica de IDE:** Por padrão, os prompts são instalados em `.agent/prompts/`. Se você usa **Cursor** ou **Windsurf**:
 > ```bash
 > # Para Cursor (.cursor/rules):
 > curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash -s -- . cursor
@@ -48,41 +46,38 @@ curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | ba
 
 ---
 
-### 📁 Estrutura de Diretórios Gerada no Projeto Após a Instalação
-
-Após executar o comando acima, o seu repositório passará a conter a seguinte organização modular:
+### 📁 Estrutura de Diretórios Gerada no Projeto
 
 ```plaintext
 seu-projeto/
-├── .agent/prompts/                          # (ou .cursor/rules/ ou .windsurf/rules/)
-│   ├── driven-development/                  # Metodologias & Guardrails Arquiteturais
-│   │   ├── bdd_behavior_driven.md           # BDD, Gherkin & Critérios de Aceite Executáveis
-│   │   ├── cdd_contract_driven.md           # Contratos OpenAPI, AsyncAPI & Consumer Pact
-│   │   ├── project_context.md               # Contexto, Dicionário do Projeto & Regras de IA
-│   │   ├── sdd_spec_driven.md               # Software Design Doc (SDD) & Schemas Zod Estritos
-│   │   ├── secdd_abuse_cases.md             # Testes de Exploit, BOLA & Casos de Abuso
-│   │   ├── tdd_test_driven.md               # Ciclo Red-Green-Refactor & Testes Unitários
-│   │   ├── test_suite_generator.md          # Geração Completa da Pirâmide de Testes (Unit/Int/E2E)
-│   │   └── technical_documentation.md       # Documentação Técnica Completa (Docs-as-Code & C4)
-│   ├── security/                            # AppSec & Auditorias Especializadas
-│   │   ├── ai_appsec.md                     # OWASP Top 10 for LLMs / GenAI Security
-│   │   ├── api.md                           # OWASP API Security Top 10 & Rate Limiting
-│   │   ├── business.md                      # Falhas de Lógica de Negócio, Fraudes & TOCTOU
-│   │   ├── db.md                            # Concorrência de Banco, Locks & Limites DDD
-│   │   ├── frontend.md                      # Client-Side Security, XSS, CSRF & SPAs
-│   │   ├── secrets.md                       # Scanner TruffleHog3 & Gestão de Segredos
-│   │   ├── supply_chain.md                  # Supply Chain, SCA & Anti-Slopsquatting
-│   │   └── threat_modeling.md               # Modelagem de Ameaças & Framework STRIDE
-│   └── devops/                              # Infraestrutura, CI/CD & Confiabilidade
-│       ├── cicd_pipeline.md                 # Hardening de Pipelines (GitHub Actions / GitLab CI)
-│       ├── iac_docker_k8s.md                # IaC (Terraform), Docker Rootless & K8s Security
-│       └── resilience_observability.md      # SRE, OpenTelemetry, Filas DLQ & Resiliência
-├── src/                                     # Código-fonte da sua aplicação
-├── tests/                                   # Suíte de testes automatizados
-├── docs/                                    # Onde os relatórios PDF e auditorias serão gerados
-├── CONTEXT.md                               # Dicionário e vocabulário do negócio para IAs
-├── CLAUDE.md / .cursorrules                 # Diretrizes específicas para cada ferramenta de IA
-└── package.json / pyproject.toml / go.mod   # Dependências e manifestos do seu projeto
+├── .agent/prompts/
+│   ├── driven-development/
+│   │   ├── bdd_behavior_driven.md
+│   │   ├── cdd_contract_driven.md
+│   │   ├── project_context.md
+│   │   ├── sdd_spec_driven.md
+│   │   ├── secdd_abuse_cases.md
+│   │   ├── tdd_test_driven.md
+│   │   ├── test_suite_generator.md
+│   │   └── technical_documentation.md
+│   ├── security/
+│   │   ├── ai_appsec.md
+│   │   ├── api.md
+│   │   ├── business.md
+│   │   ├── db.md
+│   │   ├── frontend.md
+│   │   ├── secrets.md
+│   │   ├── supply_chain.md
+│   │   └── threat_modeling.md
+│   └── devops/
+│       ├── cicd_pipeline.md
+│       ├── iac_docker_k8s.md
+│       └── resilience_observability.md
+├── src/
+├── tests/
+├── docs/
+├── CONTEXT.md
+└── CLAUDE.md / .cursorrules
 ```
 
 ---
@@ -90,40 +85,45 @@ seu-projeto/
 ## 🧭 O Ciclo de Desenvolvimento Seguro (Yellow Team Pipeline)
 
 ```mermaid
-flowchart TD
-    subgraph F1 ["FASE 1: ARQUITETURA, CONTEXTO & MODELAGEM"]
-        A["Demanda / Ideia"] --> B0["project_context.md (CONTEXT.md, CLAUDE.md)"]
-        B0 --> B["sdd_spec_driven.md (Spec & Schema-First)"]
-        B --> C["threat_modeling.md (STRIDE & Trust Boundaries)"]
-        B --> D["cdd_contract_driven.md (OpenAPI / AsyncAPI / Pact)"]
-        B --> D2["technical_documentation.md (Docs-as-Code & C4 Model)"]
+graph TD
+    subgraph F1["1. Arquitetura & Contexto"]
+        A["Demanda / Ideia"] --> B0["project_context.md"]
+        B0 --> B["sdd_spec_driven.md"]
+        B --> C["threat_modeling.md"]
+        B --> D["cdd_contract_driven.md"]
+        B --> D2["technical_documentation.md"]
     end
 
-    subgraph F2 ["FASE 2: COMPORTAMENTO & TESTES DEFENSIVOS"]
-        B & C --> E["bdd_behavior_driven.md (Gherkin: Given/When/Then)"]
-        E --> F["secdd_abuse_cases.md (Testes de Exploit & Concorrência)"]
-        F --> G["tdd_test_driven.md (Ciclo Red-Green-Refactor)"]
-        G --> G2["test_suite_generator.md (Geração de Testes Unit/Int/E2E)"]
+    subgraph F2["2. Comportamento & Testes"]
+        D2 --> E["bdd_behavior_driven.md"]
+        E --> F["secdd_abuse_cases.md"]
+        F --> G["tdd_test_driven.md"]
+        G --> G2["test_suite_generator.md"]
     end
 
-    subgraph F3 ["FASE 3: IMPLEMENTAÇÃO & VIBE CODING GUIADO"]
-        G2 --> H["Vibe Coding (Implementação Restrita aos Schemas)"]
-        H --> I["supply_chain.md (SCA & Prevenção de Alucinações)"]
+    subgraph F3["3. Implementação Guiada"]
+        G2 --> H["Vibe Coding Guiado"]
+        H --> I["supply_chain.md"]
     end
 
-    subgraph F4 ["FASE 4: AUDITORIAS TÉCNICAS ESPECIALIZADAS"]
-        H --> J1["api.md (OWASP API Top 10)"]
-        H --> J2["business.md (Business Logic Flaws)"]
-        H --> J3["db.md (Concorrência & Limites DDD)"]
-        H --> J4["frontend.md (Client-Side Security)"]
-        H --> J5["secrets.md (TruffleHog3 Scanner)"]
-        H --> J6["ai_appsec.md (OWASP LLM Top 10)"]
+    subgraph F4["4. Auditorias Especializadas"]
+        I --> J1["api.md"]
+        I --> J2["business.md"]
+        I --> J3["db.md"]
+        I --> J4["frontend.md"]
+        I --> J5["secrets.md"]
+        I --> J6["ai_appsec.md"]
     end
 
-    subgraph F5 ["FASE 5: INFRAESTRUTURA, CI/CD & ESTABILIDADE"]
-        J1 & J2 & J3 & J4 & J5 & J6 --> K1["cicd_pipeline.md (Pipeline Hardening)"]
-        K1 --> K2["iac_docker_k8s.md (Containers & K8s Security)"]
-        K2 --> K3["resilience_observability.md (SRE & OpenTelemetry)"]
+    subgraph F5["5. Deploy & Resiliência"]
+        J1 --> K1["cicd_pipeline.md"]
+        J2 --> K1
+        J3 --> K1
+        J4 --> K1
+        J5 --> K1
+        J6 --> K1
+        K1 --> K2["iac_docker_k8s.md"]
+        K2 --> K3["resilience_observability.md"]
     end
 ```
 
@@ -131,146 +131,166 @@ flowchart TD
 
 ## 💡 Qual Prompt Usar? (Guia de Ação Rápida com Exemplos)
 
-Encontre abaixo exatamente o que você deseja fazer e o prompt correspondente pronto para executar no chat da sua IDE ou Agente:
-
 ### 🛡️ 1. Segurança & AppSec
+
 * **Para saber a segurança da API da aplicação (OWASP API Top 10):**
   * **Use:** [`prompts/security/api.md`](prompts/security/api.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/api.md] Execute a auditoria de APIs neste repositório e gere o relatório em PDF.
+    @[.agent/prompts/security/api.md]
+    Execute a auditoria de APIs neste repositório e gere o relatório em PDF.
     ```
 
 * **Para encontrar fraudes, falhas em regras de negócio e pulo de etapas (checkout/MFA):**
   * **Use:** [`prompts/security/business.md`](prompts/security/business.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/business.md] Audite as regras de negócio de pedidos e pagamentos contra fraudes e race conditions (TOCTOU).
+    @[.agent/prompts/security/business.md]
+    Audite as regras de negócio contra fraudes e race conditions (TOCTOU).
     ```
 
-* **Para checar vazamento de senhas, chaves de API e segredos expostos no Git ou `.env`:**
+* **Para checar vazamento de senhas, chaves de API e segredos no Git ou `.env`:**
   * **Use:** [`prompts/security/secrets.md`](prompts/security/secrets.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/secrets.md] Configure o venv, rode o TruffleHog3 e filtre os segredos e falsos positivos do projeto.
+    @[.agent/prompts/security/secrets.md]
+    Configure o venv, execute o TruffleHog3 e faça a triagem de segredos.
     ```
 
 * **Para auditar a segurança do frontend, SPAs e proteção contra XSS/CSRF:**
   * **Use:** [`prompts/security/frontend.md`](prompts/security/frontend.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/frontend.md] Audite os componentes e rotas frontend contra XSS, vazamento de tokens e problemas de Core Web Vitals.
+    @[.agent/prompts/security/frontend.md]
+    Audite os componentes frontend contra XSS, vazamento de tokens e CWV.
     ```
 
 * **Para auditar a segurança do banco de dados, concorrência e injeções SQL:**
   * **Use:** [`prompts/security/db.md`](prompts/security/db.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/db.md] Audite as queries e migrações do banco contra SQL Injection, N+1 queries e deadlocks de concorrência.
+    @[.agent/prompts/security/db.md]
+    Audite as queries e migrações contra SQLi, N+1 queries e deadlocks.
     ```
 
-* **Para identificar alucinações de pacotes por IA (*Slopsquatting*), CVEs e dependências maliciosas:**
+* **Para identificar alucinações de pacotes por IA (*Slopsquatting*) e CVEs:**
   * **Use:** [`prompts/security/supply_chain.md`](prompts/security/supply_chain.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/supply_chain.md] Audite o package.json e lockfiles contra pacotes alucinados e vulnerabilidades conhecidas (SCA).
+    @[.agent/prompts/security/supply_chain.md]
+    Audite as dependências contra pacotes alucinados e vulnerabilidades SCA.
     ```
 
 * **Para mapear ameaças (STRIDE) e fronteiras de confiança antes de codificar:**
   * **Use:** [`prompts/security/threat_modeling.md`](prompts/security/threat_modeling.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/threat_modeling.md] Faça a modelagem de ameaças STRIDE para a arquitetura desta aplicação e gere a matriz de contramedidas.
+    @[.agent/prompts/security/threat_modeling.md]
+    Faça a modelagem de ameaças STRIDE para a arquitetura desta aplicação.
     ```
 
 * **Para auditar aplicações que usam IA (LLMs, RAG e Agentes) contra injeção de prompt:**
   * **Use:** [`prompts/security/ai_appsec.md`](prompts/security/ai_appsec.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/ai_appsec.md] Audite as integrações de LLM e RAG contra Prompt Injection, Insecure Output e Excessive Agency.
+    @[.agent/prompts/security/ai_appsec.md]
+    Audite as integrações de IA contra Prompt Injection e Insecure Output.
     ```
 
 ---
 
 ### 🎯 2. Arquitetura, Contexto & Testes (Driven Developments)
+
 * **Para ensinar o vocabulário do seu negócio à IA e gerar `CONTEXT.md`, `CLAUDE.md` e `.cursorrules`:**
   * **Use:** [`prompts/driven-development/project_context.md`](prompts/driven-development/project_context.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/project_context.md] Crie o CONTEXT.md com o dicionário do projeto e os arquivos CLAUDE.md e .cursorrules.
+    @[.agent/prompts/driven-development/project_context.md]
+    Crie o CONTEXT.md com o dicionário do projeto e os arquivos de regras de IA.
     ```
 
 * **Para gerar a documentação técnica completa da aplicação (Stack, C4 Model, DER do Banco e APIs):**
   * **Use:** [`prompts/driven-development/technical_documentation.md`](prompts/driven-development/technical_documentation.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/technical_documentation.md] Mapeie o projeto e gere o docs/architecture/ARCHITECTURE.md com diagramas Mermaid C4 e DER.
+    @[.agent/prompts/driven-development/technical_documentation.md]
+    Mapeie o projeto e gere o docs/architecture/ARCHITECTURE.md completo.
     ```
 
-* **Para gerar, escrever e rodar a suíte completa de testes automatizados (Unitários, Integração e E2E):**
+* **Para gerar, escrever e rodar a suíte completa de testes (Unitários, Integração e E2E):**
   * **Use:** [`prompts/driven-development/test_suite_generator.md`](prompts/driven-development/test_suite_generator.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/test_suite_generator.md] Crie os testes unitários e de integração que faltam neste projeto e rode até ficarem 100% verdes.
+    @[.agent/prompts/driven-development/test_suite_generator.md]
+    Crie os testes que faltam neste projeto e execute até ficarem 100% verdes.
     ```
 
-* **Para planejar uma nova funcionalidade com especificação técnica (SDD) e Schemas Zod antes de programar:**
+* **Para planejar uma nova funcionalidade com especificação técnica (SDD) e Schemas Zod:**
   * **Use:** [`prompts/driven-development/sdd_spec_driven.md`](prompts/driven-development/sdd_spec_driven.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/sdd_spec_driven.md] Crie o Software Design Document e os Schemas Zod para a nova funcionalidade de [Nome da Feature].
+    @[.agent/prompts/driven-development/sdd_spec_driven.md]
+    Crie o Software Design Document e os Schemas Zod para a nova feature.
     ```
 
 * **Para criar testes automáticos de invasão, BOLA/IDOR, Mass Assignment e concorrência:**
   * **Use:** [`prompts/driven-development/secdd_abuse_cases.md`](prompts/driven-development/secdd_abuse_cases.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/secdd_abuse_cases.md] Escreva testes de abuso simulando usuários tentando acessar dados de outros tenants e estourar rate limit.
+    @[.agent/prompts/driven-development/secdd_abuse_cases.md]
+    Escreva testes de abuso simulando invasões e concorrência maliciosa.
     ```
 
-* **Para documentar o comportamento do sistema em Gherkin (`Given/When/Then`) e validar máquinas de estado:**
+* **Para documentar o comportamento do sistema em Gherkin (`Given/When/Then`):**
   * **Use:** [`prompts/driven-development/bdd_behavior_driven.md`](prompts/driven-development/bdd_behavior_driven.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/bdd_behavior_driven.md] Modele os fluxos de checkout e cancelamento em arquivos .feature com sintaxe Gherkin.
+    @[.agent/prompts/driven-development/bdd_behavior_driven.md]
+    Modele os fluxos de negócio em arquivos .feature com sintaxe Gherkin.
     ```
 
-* **Para aplicar o ciclo TDD (Red-Green-Refactor) e cobrir casos de borda em funções:**
+* **Para aplicar o ciclo TDD (Red-Green-Refactor) e cobrir casos de borda:**
   * **Use:** [`prompts/driven-development/tdd_test_driven.md`](prompts/driven-development/tdd_test_driven.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/tdd_test_driven.md] Aplique TDD para criar os testes unitários da camada de serviços antes de implementar o código.
+    @[.agent/prompts/driven-development/tdd_test_driven.md]
+    Aplique TDD para criar os testes unitários antes de codificar a lógica.
     ```
 
-* **Para garantir contratos de API entre serviços e frontend sem quebras (*Breaking Changes*):**
+* **Para garantir contratos de API entre serviços e frontend sem quebras:**
   * **Use:** [`prompts/driven-development/cdd_contract_driven.md`](prompts/driven-development/cdd_contract_driven.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/cdd_contract_driven.md] Valide a conformidade das rotas com a spec OpenAPI e configure testes de contrato Pact.
+    @[.agent/prompts/driven-development/cdd_contract_driven.md]
+    Valide as rotas com a spec OpenAPI e configure testes de contrato Pact.
     ```
 
 ---
 
 ### ⚙️ 3. DevOps, Infraestrutura & Resiliência
+
 * **Para auditar e proteger a esteira de CI/CD (GitHub Actions / GitLab CI):**
   * **Use:** [`prompts/devops/cicd_pipeline.md`](prompts/devops/cicd_pipeline.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/devops/cicd_pipeline.md] Audite os workflows de CI/CD contra script injection, permissões excessivas e chaves de nuvem estáticas.
+    @[.agent/prompts/devops/cicd_pipeline.md]
+    Audite os workflows contra script injection e permissões excessivas.
     ```
 
 * **Para checar a segurança do Docker (rootless/multi-stage) e manifestos Kubernetes:**
   * **Use:** [`prompts/devops/iac_docker_k8s.md`](prompts/devops/iac_docker_k8s.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/devops/iac_docker_k8s.md] Audite os Dockerfiles e manifests K8s garantindo securityContext restrito e limites de memória/CPU.
+    @[.agent/prompts/devops/iac_docker_k8s.md]
+    Audite Dockerfiles e K8s garantindo securityContext restrito e limites.
     ```
 
-* **Para auditar filas, mensageria (DLQ), observabilidade (OpenTelemetry) e estabilidade SRE:**
+* **Para auditar filas, mensageria (DLQ), observabilidade (OTel) e estabilidade SRE:**
   * **Use:** [`prompts/devops/resilience_observability.md`](prompts/devops/resilience_observability.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/devops/resilience_observability.md] Audite os workers de fila contra poison pills, configure retry com backoff e valide o graceful shutdown.
+    @[.agent/prompts/devops/resilience_observability.md]
+    Audite os workers de fila, configure retry com DLQ e graceful shutdown.
     ```
 
 ---
