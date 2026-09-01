@@ -10,7 +10,7 @@
 
 **A biblioteca definitiva de prompts estruturados de auditoria profunda, arquitetura defensiva e metodologias *Driven Development* para desenvolvedores, arquitetos e agentes de Inteligência Artificial.**
 
-[Instalação Rápida](#-instalação-rápida) • [O Ciclo Yellow Team](#-o-ciclo-de-desenvolvimento-seguro-yellow-team-pipeline) • [Qual Prompt Usar?](#-qual-prompt-usar-guia-de-ação-rápida-com-exemplos) • [Catálogo Completo](#-catálogo-completo-de-prompts) • [Contribuição](CONTRIBUTING.md)
+[Instalação Rápida](#-instalação-rápida) • [Qual Prompt Usar?](#-qual-prompt-usar-guia-de-ação-rápida-com-exemplos) • [Catálogo Completo](#-catálogo-completo-de-prompts) • [Contribuição](CONTRIBUTING.md)
 
 </div>
 
@@ -78,60 +78,6 @@ seu-projeto/
 ├── docs/
 ├── CONTEXT.md
 └── CLAUDE.md / .cursorrules
-```
-
----
-
-## 🧭 O Ciclo de Desenvolvimento Seguro (Yellow Team Pipeline)
-
-```mermaid
-flowchart TD
-    subgraph Fase1 ["1. Arquitetura e Contexto"]
-        A["Demanda / Nova Funcionalidade"] --> B0["project_context.md"]
-        B0 --> B["sdd_spec_driven.md"]
-        B --> C["threat_modeling.md"]
-        C --> D["cdd_contract_driven.md"]
-        D --> D2["technical_documentation.md"]
-    end
-
-    subgraph Fase2 ["2. Comportamento e Testes Defensivos"]
-        E["bdd_behavior_driven.md"] --> F["secdd_abuse_cases.md"]
-        F --> G["tdd_test_driven.md"]
-        G --> G2["test_suite_generator.md"]
-    end
-
-    subgraph Fase3 ["3. Implementacao e Vibe Coding Guiado"]
-        H["Vibe Coding (Restrito a Schemas)"] --> I["supply_chain.md (SCA)"]
-    end
-
-    subgraph Fase4 ["4. Auditorias Tecnicas Especializadas"]
-        J1["api.md (OWASP API)"]
-        J2["business.md (Fraudes/TOCTOU)"]
-        J3["db.md (Concorrencia/Locks)"]
-        J4["frontend.md (XSS/SPAs)"]
-        J5["secrets.md (TruffleHog3)"]
-        J6["ai_appsec.md (OWASP LLM)"]
-    end
-
-    subgraph Fase5 ["5. Infraestrutura, Deploy e SRE"]
-        K1["cicd_pipeline.md"] --> K2["iac_docker_k8s.md"]
-        K2 --> K3["resilience_observability.md"]
-    end
-
-    D2 --> E
-    G2 --> H
-    I --> J1
-    I --> J2
-    I --> J3
-    I --> J4
-    I --> J5
-    I --> J6
-    J1 --> K1
-    J2 --> K1
-    J3 --> K1
-    J4 --> K1
-    J5 --> K1
-    J6 --> K1
 ```
 
 ---
