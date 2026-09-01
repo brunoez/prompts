@@ -86,51 +86,52 @@ seu-projeto/
 
 ```mermaid
 flowchart TD
-    subgraph F1["1. Arquitetura, Contexto & Modelagem"]
-        direction TB
-        B0["project_context.md"]
-        B["sdd_spec_driven.md"]
-        C["threat_modeling.md"]
-        D["cdd_contract_driven.md"]
-        D2["technical_documentation.md"]
+    subgraph Fase1 ["1. Arquitetura e Contexto"]
+        A["Demanda / Nova Funcionalidade"] --> B0["project_context.md"]
+        B0 --> B["sdd_spec_driven.md"]
+        B --> C["threat_modeling.md"]
+        C --> D["cdd_contract_driven.md"]
+        D --> D2["technical_documentation.md"]
     end
 
-    subgraph F2["2. Comportamento & Testes Defensivos"]
-        direction TB
-        E["bdd_behavior_driven.md"]
-        F["secdd_abuse_cases.md"]
-        G["tdd_test_driven.md"]
-        G2["test_suite_generator.md"]
+    subgraph Fase2 ["2. Comportamento e Testes Defensivos"]
+        E["bdd_behavior_driven.md"] --> F["secdd_abuse_cases.md"]
+        F --> G["tdd_test_driven.md"]
+        G --> G2["test_suite_generator.md"]
     end
 
-    subgraph F3["3. Implementação & Vibe Coding Guiado"]
-        direction TB
-        H["Vibe Coding (Restrito a Schemas)"]
-        I["supply_chain.md (SCA / Anti-Alucinação)"]
+    subgraph Fase3 ["3. Implementacao e Vibe Coding Guiado"]
+        H["Vibe Coding (Restrito a Schemas)"] --> I["supply_chain.md (SCA)"]
     end
 
-    subgraph F4["4. Auditorias Técnicas Especializadas"]
-        direction TB
+    subgraph Fase4 ["4. Auditorias Tecnicas Especializadas"]
         J1["api.md (OWASP API)"]
         J2["business.md (Fraudes/TOCTOU)"]
-        J3["db.md (Concorrência/Locks)"]
+        J3["db.md (Concorrencia/Locks)"]
         J4["frontend.md (XSS/SPAs)"]
         J5["secrets.md (TruffleHog3)"]
         J6["ai_appsec.md (OWASP LLM)"]
     end
 
-    subgraph F5["5. Infraestrutura, Deploy & SRE"]
-        direction TB
-        K1["cicd_pipeline.md"]
-        K2["iac_docker_k8s.md"]
-        K3["resilience_observability.md"]
+    subgraph Fase5 ["5. Infraestrutura, Deploy e SRE"]
+        K1["cicd_pipeline.md"] --> K2["iac_docker_k8s.md"]
+        K2 --> K3["resilience_observability.md"]
     end
 
-    A["Demanda / Nova Funcionalidade"] --> F1
-    F1 --> F2
-    F2 --> F3
-    F3 --> F4
-    F4 --> F5
+    D2 --> E
+    G2 --> H
+    I --> J1
+    I --> J2
+    I --> J3
+    I --> J4
+    I --> J5
+    I --> J6
+    J1 --> K1
+    J2 --> K1
+    J3 --> K1
+    J4 --> K1
+    J5 --> K1
+    J6 --> K1
 ```
 
 ---
