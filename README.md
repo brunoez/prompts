@@ -50,34 +50,34 @@ curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | ba
 
 ```plaintext
 seu-projeto/
-├── .agent/prompts/
-│   ├── driven-development/
-│   │   ├── bdd_behavior_driven.md
-│   │   ├── cdd_contract_driven.md
-│   │   ├── project_context.md
-│   │   ├── sdd_spec_driven.md
-│   │   ├── secdd_abuse_cases.md
-│   │   ├── tdd_test_driven.md
-│   │   ├── test_suite_generator.md
-│   │   └── technical_documentation.md
-│   ├── security/
-│   │   ├── ai_appsec.md
-│   │   ├── api.md
-│   │   ├── business.md
-│   │   ├── db.md
-│   │   ├── frontend.md
-│   │   ├── secrets.md
-│   │   ├── supply_chain.md
-│   │   └── threat_modeling.md
-│   └── devops/
-│       ├── cicd_pipeline.md
-│       ├── iac_docker_k8s.md
-│       └── resilience_observability.md
-├── src/
-├── tests/
-├── docs/
-├── CONTEXT.md
-└── CLAUDE.md / .cursorrules
+├── .agent/prompts/               # Prompts (ou .cursor/rules/)
+│   ├── driven-development/       # Metodologias & Testes
+│   │   ├── bdd_behavior_driven.md     # BDD & Gherkin
+│   │   ├── cdd_contract_driven.md     # Contratos & OpenAPI
+│   │   ├── project_context.md         # Dicionário & Regras IA
+│   │   ├── sdd_spec_driven.md         # SDD & Schemas Zod
+│   │   ├── secdd_abuse_cases.md       # Casos de Abuso & SecDD
+│   │   ├── tdd_test_driven.md         # TDD Red-Green-Refactor
+│   │   ├── test_suite_generator.md    # Gerador de Testes QA
+│   │   └── technical_documentation.md # Docs-as-Code & C4
+│   ├── security/                 # Auditorias de AppSec
+│   │   ├── ai_appsec.md               # OWASP LLM Top 10
+│   │   ├── api.md                     # OWASP API Top 10
+│   │   ├── business.md                # Fraudes & TOCTOU
+│   │   ├── db.md                      # Locks & Concorrência
+│   │   ├── frontend.md                # XSS, CSP & SPAs
+│   │   ├── secrets.md                 # TruffleHog3 Scanner
+│   │   ├── supply_chain.md            # SCA & Anti-Alucinação
+│   │   └── threat_modeling.md         # Modelagem STRIDE
+│   └── devops/                   # Infraestrutura & SRE
+│       ├── cicd_pipeline.md           # Hardening de CI/CD
+│       ├── iac_docker_k8s.md          # Docker Rootless & K8s
+│       └── resilience_observability.md# SRE & OpenTelemetry
+├── src/                          # Código da sua aplicação
+├── tests/                        # Testes automatizados
+├── docs/                         # Relatórios em PDF
+├── CONTEXT.md                    # Dicionário do negócio
+└── CLAUDE.md / .cursorrules      # Regras de IA do projeto
 ```
 
 ---
