@@ -1,0 +1,19 @@
+stages:
+  - lint
+  - test
+
+lint:markdown:
+  stage: lint
+  image: node:alpine
+  before_script:
+    - npm install -g markdownlint-cli
+  script:
+    - markdownlint "**/*.md" --ignore node_modules --ignore docs || true
+  allow_failure: true
+
+test:scripts:
+  stage: test
+  image: bash:latest
+  script:
+    - bash -n install.sh
+    - bash -n scripts/install.sh
