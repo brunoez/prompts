@@ -85,46 +85,52 @@ seu-projeto/
 ## 🧭 O Ciclo de Desenvolvimento Seguro (Yellow Team Pipeline)
 
 ```mermaid
-graph TD
-    subgraph F1["1. Arquitetura & Contexto"]
-        A["Demanda / Ideia"] --> B0["project_context.md"]
-        B0 --> B["sdd_spec_driven.md"]
-        B --> C["threat_modeling.md"]
-        B --> D["cdd_contract_driven.md"]
-        B --> D2["technical_documentation.md"]
+flowchart TD
+    subgraph F1["1. Arquitetura, Contexto & Modelagem"]
+        direction TB
+        B0["project_context.md"]
+        B["sdd_spec_driven.md"]
+        C["threat_modeling.md"]
+        D["cdd_contract_driven.md"]
+        D2["technical_documentation.md"]
     end
 
-    subgraph F2["2. Comportamento & Testes"]
-        D2 --> E["bdd_behavior_driven.md"]
-        E --> F["secdd_abuse_cases.md"]
-        F --> G["tdd_test_driven.md"]
-        G --> G2["test_suite_generator.md"]
+    subgraph F2["2. Comportamento & Testes Defensivos"]
+        direction TB
+        E["bdd_behavior_driven.md"]
+        F["secdd_abuse_cases.md"]
+        G["tdd_test_driven.md"]
+        G2["test_suite_generator.md"]
     end
 
-    subgraph F3["3. Implementação Guiada"]
-        G2 --> H["Vibe Coding Guiado"]
-        H --> I["supply_chain.md"]
+    subgraph F3["3. Implementação & Vibe Coding Guiado"]
+        direction TB
+        H["Vibe Coding (Restrito a Schemas)"]
+        I["supply_chain.md (SCA / Anti-Alucinação)"]
     end
 
-    subgraph F4["4. Auditorias Especializadas"]
-        I --> J1["api.md"]
-        I --> J2["business.md"]
-        I --> J3["db.md"]
-        I --> J4["frontend.md"]
-        I --> J5["secrets.md"]
-        I --> J6["ai_appsec.md"]
+    subgraph F4["4. Auditorias Técnicas Especializadas"]
+        direction TB
+        J1["api.md (OWASP API)"]
+        J2["business.md (Fraudes/TOCTOU)"]
+        J3["db.md (Concorrência/Locks)"]
+        J4["frontend.md (XSS/SPAs)"]
+        J5["secrets.md (TruffleHog3)"]
+        J6["ai_appsec.md (OWASP LLM)"]
     end
 
-    subgraph F5["5. Deploy & Resiliência"]
-        J1 --> K1["cicd_pipeline.md"]
-        J2 --> K1
-        J3 --> K1
-        J4 --> K1
-        J5 --> K1
-        J6 --> K1
-        K1 --> K2["iac_docker_k8s.md"]
-        K2 --> K3["resilience_observability.md"]
+    subgraph F5["5. Infraestrutura, Deploy & SRE"]
+        direction TB
+        K1["cicd_pipeline.md"]
+        K2["iac_docker_k8s.md"]
+        K3["resilience_observability.md"]
     end
+
+    A["Demanda / Nova Funcionalidade"] --> F1
+    F1 --> F2
+    F2 --> F3
+    F3 --> F4
+    F4 --> F5
 ```
 
 ---
