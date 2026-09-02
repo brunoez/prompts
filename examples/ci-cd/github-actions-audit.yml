@@ -1,13 +1,14 @@
 # ==============================================================================
-# GitHub Actions Workflow: Auditoria de Segurança com IA & Integração Jira
+# GitHub Actions Workflow: Auditoria de Segurança com IA & Sync (GitHub/Jira)
 # Modelo para uso em Projetos Privados de Clientes / Empresas
 # ==============================================================================
 # Este workflow executa a suíte de prompts de AppSec (OWASP ASTF 2023 / WSTG v4.2)
 # em cada Pull Request, gerando relatórios em PDF, publicando alertas no
-# GitHub Security via SARIF e sincronizando vulnerabilidades críticas no Jira.
+# GitHub Security via SARIF e sincronizando vulnerabilidades críticas no
+# GitHub Issues e/ou Jira.
 # ==============================================================================
 
-name: 🛡️ AI Security & AppSec Audit (OWASP ASTF + Jira)
+name: 🛡️ AI Security & AppSec Audit (OWASP ASTF)
 
 on:
   pull_request:
@@ -23,10 +24,11 @@ permissions:
   contents: read
   security-events: write  # Permite enviar resultados SARIF para o GitHub Security
   pull-requests: write    # Permite comentar o resumo da auditoria no PR
+  issues: write           # Permite criar issues automáticas para falhas críticas
 
 jobs:
   security-audit:
-    name: OWASP AppSec Audit & Jira Sync
+    name: OWASP AppSec Audit & Ticket Sync
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -84,7 +86,17 @@ jobs:
           path: docs/api-audit/*.pdf
           retention-days: 30
 
-      - name: 📌 Sincronizar Vulnerabilidades Críticas com o Jira
+      - name: 🐙 Criar GitHub Issues para Vulnerabilidades Críticas
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          SARIF_PATH: docs/api-audit/results.sarif
+        run: |
+          # Executa o sincronizador com GitHub Issues
+          python3 .agent/prompts/examples/ci-cd/github_issues_sync.py || python3 examples/ci-cd/github_issues_sync.py
+
+      - name: 📌 Sincronizar Vulnerabilidades Críticas com o Jira (Opcional)
         if: always()
         env:
           JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}          # ex: https://minha-empresa.atlassian.net
@@ -93,11 +105,10 @@ jobs:
           JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}    # ex: SEC ou PROJ
           SARIF_PATH: docs/api-audit/results.sarif
         run: |
-          # Executa o script de sincronização com o Jira (se configurado)
           if [ -n "$JIRA_BASE_URL" ] && [ -n "$JIRA_API_TOKEN" ]; then
             python3 .agent/prompts/examples/ci-cd/jira_sync.py || python3 examples/ci-cd/jira_sync.py
           else
-            echo "ℹ️ Secrets do Jira não configurados. Pulando sincronização com o Jira."
+            echo "ℹ️ Secrets do Jira não configurados. Pulando sincronização com Jira."
           fi
 
       - name: 💬 Comentar Resumo da Auditoria no Pull Request
@@ -108,7 +119,7 @@ jobs:
             let message = '### 🛡️ Relatório de Auditoria de Segurança com IA (OWASP ASTF)\n\n';
             message += '✅ A varredura de segurança foi executada com sucesso.\n';
             message += '📄 **Relatório em PDF:** Disponível para download nos artefatos da execução desta Action.\n';
-            message += '🔍 **Alertas de Segurança:** Consulte a aba **Security > Code Scanning** deste repositório.\n';
+            message += '🔍 **Alertas de Segurança:** Consulte a aba **Security > Code Scanning** e as **Issues** deste repositório.\n';
             
             github.rest.issues.createComment({
               issue_number: context.issue.number,

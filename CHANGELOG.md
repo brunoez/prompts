@@ -5,17 +5,24 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/lang/pt-BR/).
 
+## [1.4.0] - 2026-09-02
+
+### Adicionado (Sincronização Nativa com GitHub Issues e GitLab Boards)
+- **Sincronizador com GitHub Issues (`examples/ci-cd/github_issues_sync.py`):**
+  - Script autônomo em Python que consome o arquivo `results.sarif` e cria automaticamente Issues no GitHub para vulnerabilidades Críticas e Altas com zero duplicatas.
+  - Formatação rica em GitHub Markdown contendo arquivo, linha, regra OWASP, evidência e labels escopadas (`severity:critical`, `appsec`, `bug`).
+- **Sincronizador com GitLab Issues & Boards (`examples/ci-cd/gitlab_issues_sync.py`):**
+  - Script autônomo em Python para integração com a API v4 do GitLab, criando issues com scoped labels (`severity::critical`) prontas para os Issue Boards da organização.
+- **Workflows Atualizados (`github-actions-audit.yml` & `gitlab-ci-audit.yml`):**
+  - Pipelines de clientes configurados com suporte completo a tickets em GitHub Issues, GitLab Boards e Jira.
+
 ## [1.3.0] - 2026-09-02
 
 ### Adicionado (Integração com Jira REST API v3 para CI/CD)
 - **Sincronizador Automático com Jira (`examples/ci-cd/jira_sync.py`):**
-  - Script autônomo em Python (zero dependências externas) que consome o arquivo `results.sarif` gerado pelas auditorias de IA e cria automaticamente cards/bugs no Jira para vulnerabilidades Críticas e Altas.
-  - Prevenção ativa contra duplicação de tickets via consulta prévia JQL.
-  - Formatação rica em Atlassian Document Format (ADF) contendo arquivo, linha, regra OWASP, evidência e sugestão de remediação.
-- **Workflow de GitHub Actions com Jira (`examples/ci-cd/github-actions-audit.yml`):**
-  - Atualizado para incluir o passo automatizado de criação de cards no Jira caso os secrets `JIRA_BASE_URL` e `JIRA_API_TOKEN` estejam configurados.
-- **Documentação de CI/CD para Clientes (`examples/ci-cd/README.md`):**
-  - Guia passo a passo de como gerar tokens de API no Atlassian e configurar secrets de CI/CD para automação de AppSec.
+  - Script autônomo em Python que consome o arquivo `results.sarif` e cria automaticamente cards no Jira para vulnerabilidades Críticas e Altas com prevenção de duplicatas via JQL.
+- **Guia de Configuração (`examples/ci-cd/README.md`):**
+  - Documentação completa para geração de tokens no Atlassian e configuração de Secrets de CI/CD.
 
 ## [1.2.0] - 2026-09-02
 

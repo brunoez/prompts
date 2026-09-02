@@ -1,10 +1,11 @@
 # ==============================================================================
-# GitLab CI Pipeline: Auditoria de Segurança Automática com Agente de IA
+# GitLab CI Pipeline: Auditoria de Segurança com IA & Sync (GitLab Issues)
 # Modelo para uso em Projetos Privados de Clientes / Empresas no GitLab
 # ==============================================================================
 
 stages:
   - security
+  - notify
 
 ai:appsec-audit:
   stage: security
@@ -33,3 +34,14 @@ ai:appsec-audit:
       - docs/api-audit/results.sarif
     reports:
       sast: docs/api-audit/results.sarif
+
+ai:sync-issues:
+  stage: notify
+  image: python:3.11-slim
+  needs: ["ai:appsec-audit"]
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  script:
+    - echo "📌 Sincronizando vulnerabilidades com o GitLab Issues & Boards..."
+    - python3 .agent/prompts/examples/ci-cd/gitlab_issues_sync.py || python3 examples/ci-cd/gitlab_issues_sync.py
