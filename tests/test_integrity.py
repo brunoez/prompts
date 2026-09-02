@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Script de Verificação de Integridade e Qualidade da Suíte de Prompts
-Executado em CI/CD e localmente para garantir zero drift nos prompts.
+Script de Verificação de Integridade, Qualidade e Testes da Suíte de Prompts
+Executado em CI/CD e localmente para garantir zero drift nos prompts e scripts.
 """
 
 import os
@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import unittest
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -45,7 +46,7 @@ REQUIRED_SECTIONS = [
 
 
 def test_prompts_exist():
-    print("🔍 [1/5] Verificando existência física de todos os 19 prompts...")
+    print("🔍 [1/6] Verificando existência física de todos os 19 prompts...")
     missing = []
     for rel_path in EXPECTED_PROMPTS:
         full_path = PROMPTS_DIR / rel_path
@@ -59,7 +60,7 @@ def test_prompts_exist():
 
 
 def test_prompt_structure():
-    print("🔍 [2/5] Validando contrato de estrutura padrão dos prompts...")
+    print("🔍 [2/6] Validando contrato de estrutura padrão dos prompts...")
     errors = []
     for rel_path in EXPECTED_PROMPTS:
         full_path = PROMPTS_DIR / rel_path
@@ -69,7 +70,6 @@ def test_prompt_structure():
             if section not in content:
                 errors.append(f"Prompt {rel_path} não contém a seção obrigatória '{section}'")
         
-        # Validação de checklist
         if "## CHECKLIST" not in content and "### 1." not in content:
             errors.append(f"Prompt {rel_path} não contém seção de CHECKLIST de auditoria")
 
@@ -82,7 +82,7 @@ def test_prompt_structure():
 
 
 def test_install_script_sync():
-    print("🔍 [3/5] Validando sincronia do instalador install.sh...")
+    print("🔍 [3/6] Validando sincronia do instalador install.sh...")
     install_sh = ROOT_DIR / "install.sh"
     if not install_sh.is_file():
         print("❌ ERRO: install.sh não encontrado.")
@@ -102,7 +102,7 @@ def test_install_script_sync():
 
 
 def test_readme_links():
-    print("🔍 [4/5] Validando links de prompts no README.md...")
+    print("🔍 [4/6] Validando links de prompts no README.md...")
     readme = ROOT_DIR / "README.md"
     content = readme.read_text(encoding="utf-8")
     missing_in_readme = []
@@ -118,16 +118,14 @@ def test_readme_links():
 
 
 def test_installer_execution():
-    print("🔍 [5/5] Testando execução funcional do instalador install.sh...")
+    print("🔍 [5/6] Testando execução funcional do instalador install.sh...")
     with tempfile.TemporaryDirectory() as tmpdir:
-        # Teste modo 'all'
         cmd = ["bash", str(ROOT_DIR / "install.sh"), tmpdir, "all"]
         res = subprocess.run(cmd, capture_output=True, text=True)
         if res.returncode != 0:
             print(f"❌ ERRO na execução do install.sh: {res.stderr}")
             return False
         
-        # Validar se as 3 pastas foram populadas
         for folder in [".agent/prompts", ".cursor/rules", ".windsurf/rules"]:
             target_path = Path(tmpdir) / folder
             for prompt in EXPECTED_PROMPTS:
@@ -138,9 +136,20 @@ def test_installer_execution():
     return True
 
 
+def test_sync_scripts_unit():
+    print("🔍 [6/6] Executando suíte de testes unitários dos sincronizadores CI/CD...")
+    test_file = ROOT_DIR / "tests" / "test_sync_scripts.py"
+    res = subprocess.run([sys.executable, "-m", "unittest", str(test_file)], capture_output=True, text=True)
+    if res.returncode != 0:
+        print(f"❌ ERRO nos testes unitários dos scripts de sync:\n{res.stderr}")
+        return False
+    print("✅ 12/12 testes unitários dos scripts de sincronização passaram com sucesso.")
+    return True
+
+
 def main():
     print("=================================================================")
-    print("  🛡️  Bateria de Testes de Integridade da Suíte de Prompts")
+    print("  🛡️  Bateria de Testes de Integridade & Qualidade da Suíte")
     print("=================================================================")
     tests = [
         test_prompts_exist,
@@ -148,6 +157,7 @@ def main():
         test_install_script_sync,
         test_readme_links,
         test_installer_execution,
+        test_sync_scripts_unit,
     ]
     
     failed = False
@@ -157,10 +167,10 @@ def main():
             break
             
     if failed:
-        print("\n❌ FALHA: A suíte de testes de integridade encontrou erros.")
+        print("\n❌ FALHA: A suíte de testes encontrou erros.")
         sys.exit(1)
     else:
-        print("\n🎉 SUCESSO: Todos os testes de integridade e qualidade passaram!")
+        print("\n🎉 SUCESSO: Todos os testes de integridade, qualidade e unitários passaram!")
         sys.exit(0)
 
 

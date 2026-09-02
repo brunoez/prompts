@@ -5,6 +5,16 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/lang/pt-BR/).
 
+## [1.5.0] - 2026-09-02
+
+### Adicionado (Suíte de Testes Unitários com Mocks para Sincronizadores)
+- **Bateria de Testes Unitários (`tests/test_sync_scripts.py`):**
+  - 12 testes automatizados usando `unittest` e `unittest.mock` da biblioteca padrão.
+  - Validação de parsing do padrão OASIS SARIF v2.1.0, checagem de variáveis de ambiente obrigatórias, construção de payloads ricos em Atlassian Document Format (ADF) e Markdown.
+  - Testes de algoritmos de deduplicação remota e cache em memória para Jira, GitHub Issues e GitLab Boards.
+- **Integração na Bateria Central (`tests/test_integrity.py`):**
+  - Adicionado o passo `[6/6]` executando a suíte unitária em CI/CD e localmente.
+
 ## [1.4.0] - 2026-09-02
 
 ### Adicionado (Sincronização Nativa com GitHub Issues e GitLab Boards)
