@@ -1,42 +1,48 @@
-# PROMPT DE AUDITORIA COMPLETA: FRONTEND & SPAS, SEGURANÇA CLIENT-SIDE, PERFORMANCE E GERAÇÃO DE RELATÓRIO PDF
+# PROMPT DE AUDITORIA COMPLETA: FRONTEND & SPAS, OWASP CLIENT-SIDE SECURITY, PERFORMANCE E GERAÇÃO DE RELATÓRIO PDF
 
 ## OBJETIVO
-Atuar como Engenheiro Principal de Frontend e Especialista em AppSec (Yellow Team). Sua missão é realizar uma varredura completa no repositório para identificar falhas de segurança no lado do cliente (Client-Side Security), vazamento de credenciais, vulnerabilidades clássicas de SPA (React, Vue, Angular, Svelte, Next.js/Nuxt), problemas críticos de performance web (Core Web Vitals) e violações de privacidade.
+Atuar como Engenheiro Principal de Frontend e Especialista em AppSec Client-Side (Yellow Team / Browser Security Lead). Sua missão é realizar uma varredura completa no repositório aplicando as diretrizes do **OWASP Client-Side Security Cheat Sheet Series** (*DOM-based XSS Prevention, XSS Prevention, Content Security Policy, HTML5 Security, Clickjacking Defense, CSRF Prevention e Secure Cookies*).
+
+A auditoria deve identificar falhas de segurança no lado do cliente (Client-Side Security), vulnerabilidades clássicas e modernas de SPAs (React, Vue, Angular, Svelte, Next.js/Nuxt), riscos de *Prototype Pollution* no navegador, comunicação insegura via `window.postMessage`, vazamento de credenciais em bundles, headers defensivos e problemas críticos de performance web (Core Web Vitals).
 
 Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um relatório completo em formato PDF e templates de Issues em Markdown para o GitHub.
 
 ---
 
 ## ESCOPO E OBRIGATORIEDADE DE LEITURA
-1. Mapeie a estrutura completa de diretórios do projeto e identifique a stack/framework utilizado (React, Next.js, Vue, Nuxt, Angular, Vite, Webpack, etc.).
+1. Mapeie a estrutura completa de diretórios do projeto e identifique a stack/framework utilizado (React, Next.js, Vue, Nuxt, Angular, SvelteKit, Vite, Webpack, etc.).
 2. Leia todos os arquivos de documentação técnica existentes (`README.md`, `/docs`, guias de contribuição).
-3. Identifique e analise TODOS os arquivos da camada de cliente: componentes, páginas/rotas, gerenciadores de estado global (Redux, Zustand, Pinia), interceptadores HTTP/Axios/Fetch, arquivos de configuração de build, headers/meta-tags HTML e utilitários de autenticação.
+3. Identifique e analise TODOS os arquivos da camada de cliente: componentes, páginas/rotas, gerenciadores de estado global (Redux, Zustand, Pinia, Recoil), interceptadores HTTP (Axios, Fetch, TanStack Query), arquivos de configuração de build, headers/meta-tags HTML, manipuladores de eventos (`message`, `storage`) e utilitários de autenticação.
 4. Você DEVE ler e analisar cada arquivo identificado linha por linha. Não faça suposições sem validar o código-fonte correspondente.
 
 ---
 
-## CHECKLIST DE VALIDAÇÃO PRÁTICA (FRONTEND & SPAS)
+## CHECKLIST DE VALIDAÇÃO PRÁTICA (OWASP CLIENT-SIDE SECURITY & SPAS)
 
-### 1. Injeções, Renderização e Domínios Inseguros (XSS & CSRF)
-- [ ] **Cross-Site Scripting (DOM/Reflected XSS):** Identifique renderizações inseguras de HTML sem sanitização (ex: `dangerouslySetInnerHTML`, `v-html`, `[innerHTML]`, `bypassSecurityTrustHtml`).
-- [ ] **Manipulação Direta do DOM:** Localize usos perigosos de `document.write()`, `eval()`, `window.location.href = userInput` ou injeção de scripts dinâmicos sem validação estrita.
-- [ ] **Open Redirect no Cliente:** Verifique se parâmetros de query string (ex: `?redirect=/dashboard`) são usados para redirecionamento sem validação de domínio interno/relativo.
-- [ ] **Prevenção CSRF:** Verifique se requisições mutativas (POST/PUT/DELETE) dependem apenas de cookies e se há tokens anti-CSRF ou cabeçalhos customizados nos interceptadores HTTP.
+### 1. Injeções, DOM XSS e Sanitização Moderna (OWASP DOM-based XSS & Trusted Types)
+- [ ] **Cross-Site Scripting (DOM & Reflected XSS):** Identifique renderizações inseguras de HTML sem sanitização estrita (ex: `dangerouslySetInnerHTML`, `v-html`, `[innerHTML]`, `bypassSecurityTrustHtml`).
+- [ ] **Manipulação Direta e Sinks Inseguros do DOM:** Localize usos perigosos de `eval()`, `document.write()`, `element.insertAdjacentHTML()`, `window.location.href = userInput` ou injeção dinâmica de scripts sem validação de URL.
+- [ ] **Trusted Types API Support:** Verifique se a aplicação possui suporte a **Trusted Types** (`require-trusted-types-for 'script'` no CSP e uso de `trustedTypes.createPolicy()`), bloqueando injeção de strings brutas no DOM diretamente no motor do navegador.
+- [ ] **Client-Side Prototype Pollution:** Identifique funções recursivas de clonagem ou merge de objetos (`lodash.merge`, `Object.assign`, `deepMerge`) recebendo inputs não confiáveis do cliente ou queries que possam poluir `Object.prototype`.
+- [ ] **Open Redirect no Cliente:** Verifique se parâmetros de query string (ex: `?redirect=/dashboard` ou `?returnUrl=https://...`) são usados diretamente em roteadores/redirecionamentos sem validação de caminhos relativos ou whitelist de domínios seguros.
 
-### 2. Armazenamento Seguro, Autenticação e Gestão de Sessão
-- [ ] **Armazenamento Inseguro de Tokens:** Verifique se tokens JWT de acesso ou refresh tokens estão sendo persistidos em `localStorage` ou `sessionStorage` (expostos a XSS), em vez de cookies `HttpOnly` com flags `Secure` e `SameSite`.
-- [ ] **Vazamento de Segredos no Bundle:** Identifique variáveis de ambiente privadas ou chaves de API secretas vazando nos arquivos de build do cliente (ex: expostas via prefixos `NEXT_PUBLIC_`, `VITE_`, `REACT_APP_` ou chaves privadas *hardcoded*).
-- [ ] **Validação de Permissões no Cliente (UI Bypass):** Identifique se componentes sensíveis são apenas ocultados via CSS/JS (`v-if`, `&&`, `display: none`) sem validação correspondente no backend, permitindo que usuários manipulem o estado para ver interfaces proibidas.
+### 2. Comunicação Entre Janelas, Clickjacking e CSRF (OWASP HTML5 & Defense)
+- [ ] **Segurança de `window.postMessage`:** Verifique se os ouvintes de eventos de mensagem (`window.addEventListener('message', ...)`) validam rigorosamente a origem (`event.origin === TRUSTED_DOMAIN`) e a fonte (`event.source`) antes de processar payloads ou executar ações no estado global.
+- [ ] **Defesa contra Clickjacking / UI Redressing:** Verifique a presença de `Content-Security-Policy: frame-ancestors 'none'` ou `'self'` (ou `X-Frame-Options: DENY`), impedindo que a aplicação seja renderizada dentro de iframes maliciosos transparentes.
+- [ ] **Prevenção CSRF e Interceptadores HTTP:** Verifique se requisições mutativas (POST/PUT/DELETE) que utilizam cookies de sessão possuem cabeçalhos anti-CSRF customizados (ex: `X-Requested-With`, `X-CSRF-Token`) ou se os cookies utilizam `SameSite=Strict/Lax`.
+- [ ] **Reverse Tabnabbing:** Verifique se todas as tags `<a target="_blank">` possuem o atributo `rel="noopener noreferrer"` para impedir manipulação da página de origem (`window.opener`).
 
-### 3. Headers de Segurança, Dependências e Recursos Externos
-- [ ] **Content Security Policy (CSP):** Verifique se o frontend define ou possui suporte a CSP restritivo para mitigar a execução de scripts inline e fontes externas não autorizadas.
-- [ ] **Subresource Integrity (SRI):** Identifique scripts externos ou estilos carregados via CDNs de terceiros (`<script src="https://...">`) sem os atributos `integrity` e `crossorigin`.
-- [ ] **Reverse Tabnabbing:** Verifique se tags `<a target="_blank">` possuem o atributo `rel="noopener noreferrer"` para impedir manipulação da página de origem (`window.opener`).
+### 3. Armazenamento Seguro, Tokens e Cookies (OWASP Storage & Cookies Cheat Sheet)
+- [ ] **Armazenamento Inseguro de Tokens:** Verifique se tokens JWT de acesso ou refresh tokens estão sendo persistidos em `localStorage` ou `sessionStorage` (expostos a roubo via XSS), em vez de cookies `HttpOnly` com flags `Secure` e `SameSite`.
+- [ ] **Prefixos de Cookies Seguros (RFC 6265bis):** Verifique o uso de prefixos `__Host-` ou `__Secure-` para cookies de sessão e autenticação, garantindo que não sejam sobrescritos por subdomínios não confiáveis.
+- [ ] **Vazamento de Segredos no Bundle Client-Side:** Identifique variáveis de ambiente privadas ou chaves de API secretas vazando nos arquivos de build do cliente (ex: expostas via prefixos `NEXT_PUBLIC_`, `VITE_`, `REACT_APP_` ou chaves privadas *hardcoded*).
+- [ ] **Validação de Permissões no Cliente (UI Bypass):** Identifique se regras críticas de negócio e componentes sensíveis são apenas ocultados via CSS/JS (`v-if`, `&&`, `display: none`) sem validação correspondente e estrita no backend.
 
-### 4. Performance, Bundle Size e Boas Práticas (Core Web Vitals)
-- [ ] **Lazy Loading & Code Splitting:** Identifique ausência de carregamento dinâmico (`dynamic import`, `React.lazy`) em rotas pesadas ou bibliotecas volumosas (ex: Moment.js, Lodash inteiro, bibliotecas de gráficos importadas globalmente).
-- [ ] **Vazamento de Memória no DOM:** Localize listeners de eventos (`window.addEventListener`), *intervals* (`setInterval`) ou *subscriptions* (RxJS) não cancelados no ciclo de desmontagem dos componentes (`useEffect cleanup`, `ngOnDestroy`, `onUnmounted`).
-- [ ] **Exposição de Dados Sensíveis e PII:** Verifique se formulários desabilitam o preenchimento automático para campos críticos (`autocomplete="off"` / `"new-password"`) e se o código não executa `console.log()` com payloads sensíveis em produção.
+### 4. Headers de Segurança, Subresource Integrity e Performance (Core Web Vitals)
+- [ ] **Content Security Policy (CSP Estrito):** Verifique se o frontend define um CSP robusto sem diretivas perigosas (`'unsafe-eval'`, `'unsafe-inline'` desnecessário), utilizando nonces criptográficos ou hashes SHA-256 para scripts inline.
+- [ ] **Subresource Integrity (SRI):** Identifique scripts externos ou estilos carregados via CDNs de terceiros (`<script src="https://...">`) sem os atributos `integrity="sha384-..."` e `crossorigin="anonymous"`.
+- [ ] **Lazy Loading & Bundle Size:** Identifique ausência de carregamento dinâmico (`dynamic import`, `React.lazy`) em rotas pesadas ou bibliotecas volumosas importadas globalmente.
+- [ ] **Vazamentos de Memória e PII em Logs:** Localize listeners de eventos, timers (`setInterval`) ou subscriptions não cancelados no ciclo de desmontagem (`useEffect cleanup`, `onUnmounted`) e verifique a ausência de `console.log()` com dados PII em produção.
 
 ---
 
@@ -45,14 +51,15 @@ Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um 
 Ao finalizar a análise técnica no código, exiba no chat a lista detalhada de achados (arquivo por arquivo, linha por linha), ordenada por prioridade:
 
 ### PARTE 1: MATRIZ DE PRIORIZAÇÃO E QUICK WINS
-Apresente uma tabela inicial contendo TODOS os achados encontrados, ordenados obrigatoriamente do maior risco/facilidade para o menor:
+Apresente uma tabela inicial contendo TODOS os achados encontrados:
 
 | ID | Arquivo / Ponto | Categoria | Severidade | Esforço Estimado | Quick Win? |
 |---|---|---|---|---|---|
-| #1 | `src/components/UserBio.tsx:34` | Segurança (XSS) | CRÍTICA | Baixo (15 min) | **SIM** |
-| #2 | `src/utils/auth.ts:12` | Sessão (Storage) | ALTA | Médio (2 hrs) | NÃO |
+| #1 | `src/components/UserBio.tsx:34` | OWASP DOM XSS | CRÍTICA | Baixo (15 min) | **SIM** |
+| #2 | `src/listeners/message.ts:12` | PostMessage Inseguro (No Origin Check) | ALTA | Baixo (20 min) | **SIM** |
+| #3 | `src/utils/auth.ts:25` | Tokens em localStorage | ALTA | Médio (2 hrs) | NÃO |
 
-*(Quick Win: Problema de Severidade ALTA ou MÉDIA com Esforço de Correção BAIXO).*
+*(Quick Win: Problema de Severidade ALTA ou CRÍTICA com Esforço de Correção BAIXO).*
 
 ### PARTE 2: DETALHAMENTO COMPLETO DOS ACHADOS
 Para CADA item listado na tabela, forneça a análise completa:
@@ -61,10 +68,10 @@ Para CADA item listado na tabela, forneça a análise completa:
 - **Esforço de Correção:** [BAIXO | MÉDIO | ALTO]
 - **Tag:** [QUICK WIN] *(se aplicável)*
 - **Arquivo/Linha:** `caminho/do/arquivo.ext:linha`
-- **Categoria:** [XSS e Injeção / Armazenamento e Sessão / Headers e CDN / Performance e Memória / Vazamento de Segredos]
-- **Problema:** Explicação direta do risco real em ambiente de produção para o usuário final.
+- **Categoria:** [DOM XSS & Trusted Types / PostMessage Security / Clickjacking & CSRF / Storage & Secrets / CSP & SRI / Performance]
+- **Vetor de Exploração:** Explicação direta de como um atacante pode injetar scripts, roubar sessões, manipular iframes ou sequestrar contas no navegador.
 - **Evidência:** Trecho do código-fonte atual identificado no repositório.
-- **Correção Recomendada:** Código devidamente corrigido e refatorado aplicando as melhores práticas.
+- **Correção Recomendada:** Código devidamente refatorado aplicando as melhores práticas do OWASP Client-Side Security.
 
 ---
 
@@ -72,32 +79,30 @@ Para CADA item listado na tabela, forneça a análise completa:
 
 DEPOIS DA AUDITORIA, crie e execute um script para gerar um RELATÓRIO EM PDF, visualmente amigável, em pt-BR, salvo em `docs/frontend-audit/relatorio-auditoria-frontend.pdf`, contendo:
 
-a) **Capa:** Título "Relatório de Auditoria de Frontend e SPAs — <nome do projeto>", data, escopo auditado e nota metodológica (como cada categoria foi mapeada para a stack detectada).
-b) **Resumo Executivo:** Total de achados por severidade, gráfico de rosca por severidade e gráfico de barras por categoria.
+a) **Capa:** Título "Relatório de Auditoria de Frontend e SPAs (OWASP Client-Side Standards) — <nome do projeto>", data, escopo auditado e nota metodológica.
+b) **Resumo Executivo:** Total de achados por severidade, gráfico de rosca por severidade e gráfico de barras por categoria OWASP.
    - **Paleta oficial:** Crítica `#B91C1C`, Alta `#EA580C`, Média `#D97706`, Baixa `#2563EB`, Ponto Forte `#059669`.
 c) **Pontos Fortes** (o que está protegido no client-side, com evidência) e **Pontos Fracos** (os riscos centrais).
-d) **Tabela de Achados Detalhados por Categoria:** Severidade | Arquivo:linha | Descrição, com indicação/chip de severidade e tag de Quick Win.
-e) **Recomendações Priorizadas** (P1, P2, P3...).
-f) **Seção Final "ISSUES PARA O GITHUB":** Para cada achado acionável, o texto COMPLETO de uma issue em Markdown, pronto para copiar e colar, dentro de um bloco delimitado (ex: entre `--- ISSUE n ---` e `--- FIM ISSUE n ---`). Cada issue deve conter:
+d) **Matriz de Conformidade OWASP Client-Side:** Tabela indicando status para DOM XSS, PostMessage, CSP, Cookies e Clickjacking.
+e) **Tabela de Achados Detalhados por Categoria:** Severidade | Arquivo:linha | Descrição, com indicação/chip de severidade e tag de Quick Win.
+f) **Recomendações Priorizadas** (P1, P2, P3...).
+g) **Seção Final "ISSUES PARA O GITHUB":** Para cada achado acionável, o texto COMPLETO de uma issue em Markdown, pronto para copiar e colar, dentro de um bloco delimitado (ex: entre `--- ISSUE n ---` e `--- FIM ISSUE n ---`). Cada issue deve conter:
    - Título no formato `[Frontend/Segurança] <descrição curta da falha>`
-   - Labels sugeridas: `frontend` + `security` ou `performance` + severidade
-   - Descrição do problema e por que é explorável / degrada a experiência
+   - Labels sugeridas: `frontend`, `security`, `performance` + severidade
+   - Descrição do problema e cenário de exploração no browser
    - Evidência: `arquivo:linha` com trecho de código
-   - Impacto
-   - Sugestão de correção
+   - Impacto (ex: roubo de token de sessão, execução arbitrária de JavaScript, sequestro de interface)
+   - Sugestão de correção com código seguro
    - Critérios de aceite (checklist verificável)
-   *(Nota: Agrupe achados triviais relacionados numa issue única quando fizer sentido para evitar spam).*
 
 ### REGRAS TÉCNICAS PARA GERAÇÃO DO PDF
-- Não instale pacotes globalmente no sistema. Use um ambiente isolado (ex: `venv` Python com `reportlab` + `matplotlib`, ou ferramentas equivalentes locais como `puppeteer`/HTML-to-PDF).
-- Deixe o script gerador salvo no diretório `docs/frontend-audit/` para que o relatório possa ser regerado futuramente.
-- Verifique o PDF gerado: garanta o número correto de páginas, a renderização adequada dos gráficos e a legibilidade das tabelas.
-- Formatação das páginas: tamanho A4, margens de aproximadamente 2cm, cabeçalho e rodapé contendo o nome do relatório e a numeração de páginas.
+- Use ambiente Python isolado (`venv` com `reportlab` + `matplotlib`).
+- Salve o script gerador em `docs/frontend-audit/generate_report.py`.
+- Formatação das páginas: tamanho A4, margens de 2cm, cabeçalho e rodapé contendo o nome do relatório e a numeração de páginas.
 
 ---
 
 ## ENTREGÁVEIS FINAIS
-
 Ao concluir todas as etapas, informe no chat:
 1. A confirmação de geração do relatório em PDF.
 2. A lista de achados no chat (Parte 1 e Parte 2).

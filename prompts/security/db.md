@@ -1,46 +1,47 @@
-# PROMPT DE AUDITORIA COMPLETA: BANCO DE DADOS, CONCORRÊNCIA, SEGURANÇA E GERAÇÃO DE RELATÓRIO PDF
+# PROMPT DE AUDITORIA COMPLETA: BANCO DE DADOS, CONCORRÊNCIA, OWASP DATABASE SECURITY E GERAÇÃO DE RELATÓRIO PDF
 
 ## OBJETIVO
-Atuar como Engenheiro Principal de Banco de Dados e Especialista em AppSec. Sua missão é realizar uma varredura completa no repositório para garantir resiliência, performance, concorrência segura, proteção de dados e prevenção ativa contra vazamentos (Data Leakage), alinhando a validação aos pilares de DDD (limites de transação), ADD (atributos de qualidade) e TDD Concorrente.
+Atuar como Engenheiro Principal de Banco de Dados e Especialista em AppSec (Database Security & Data Protection Lead). Sua missão é realizar uma varredura completa no repositório para garantir resiliência, performance, concorrência segura, controle de acesso de menor privilégio, proteção criptográfica em repouso e prevenção ativa contra injeções e vazamentos (Data Leakage), alinhando a auditoria às diretrizes do **OWASP Database Security Cheat Sheet Series** (*Database Security, SQLi Prevention, Query Parameterization, NoSQL Injection, Database Access Control e Cryptographic Storage*), além dos pilares de DDD (limites de transação), ADD (atributos de qualidade) e TDD Concorrente.
 
-Ao final da auditoria, você deve listar os achados no terminal e gerar um relatório completo em formato PDF e templates de Issues em Markdown para o GitHub.
+Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um relatório completo em formato PDF e templates de Issues em Markdown para o GitHub.
 
 ---
 
 ## ESCOPO E OBRIGATORIEDADE DE LEITURA
-1. Mapeie a estrutura completa de diretórios do projeto e identifique a stack/tecnologia utilizada.
-2. Leia todos os arquivos de documentação e arquitetura existentes (`README.md`, `/docs`, SDD, etc.).
-3. Identifique e analise TODOS os arquivos com impacto em dados: entidades, ORMs, repositórios, SQLs nativos, scripts de migração, configurações de pool, controllers/mappers que tratam requisições/respostas do banco e arquivos de log/exceção.
+1. Mapeie a estrutura completa de diretórios do projeto e identifique a stack/tecnologia utilizada (PostgreSQL, MySQL, MongoDB, Redis, Oracle, DynamoDB, SQL Server, ORMs como Prisma, TypeORM, Hibernate, SQLAlchemy, EF Core, Dapper, etc.).
+2. Leia todos os arquivos de documentação e arquitetura existentes (`README.md`, `/docs`, SDD, diagramas ERD, scripts de migração).
+3. Identifique e analise TODOS os arquivos com impacto em dados: entidades, ORMs, repositórios, SQLs nativos, procedures/triggers, scripts de migração, configurações de pool e conexão (`DATABASE_URL`), controllers/mappers que tratam requisições/respostas do banco e arquivos de log/exceção.
 4. Você DEVE ler e analisar cada arquivo identificado linha por linha. Não faça suposições sem validar o código-fonte correspondente.
 
 ---
 
-## CHECKLIST DE VALIDAÇÃO PRÁTICA
+## CHECKLIST DE VALIDAÇÃO PRÁTICA (OWASP DATABASE SECURITY & ARQUITETURA)
 
-### 1. Limites de Transação e Arquitetura (DDD / ADD)
-- [ ] **Dual Write:** Identifique escritas sequenciais em múltiplos bancos/serviços (ex: SQL + Redis, SQL + Kafka) no mesmo fluxo sem padrões de resiliência (Transactional Outbox ou CDC).
-- [ ] **Escopo da Transação:** Identifique transações SQL curtas vs. transações longas que abraçam chamadas externas (I/O, APIs de terceiros, envios de e-mail), retendo conexões desnecessariamente.
-- [ ] **Gestão do Pool de Conexões:** Verifique ausência de timeouts, conexões não devolvidas ao pool (*Connection Leak*) e retenção indevida de threads.
+### 1. Segurança de Acesso, Privilégios e Conexão (OWASP Database Access Control & Security)
+- [ ] **Princípio do Menor Privilégio no Banco:** Verifique se a aplicação conecta no banco utilizando superusuários (`root`, `postgres`, `sa`, `admin`) ou roles com permissões DDL amplas (`DROP`, `ALTER`, `GRANT`, `SUPERUSER`), em vez de roles com privilégios estritamente necessários (ex: role DML `app_user` apenas com `SELECT`, `INSERT`, `UPDATE`, `DELETE`).
+- [ ] **Transporte Seguro (TLS/SSL Enforced):** Verifique se as strings de conexão e drivers exigem criptografia em trânsito com validação de certificados (ex: `sslmode=verify-full` ou `sslmode=verify-ca` no Postgres, `ssl-mode=VERIFY_IDENTITY` no MySQL), impedindo conexões em texto puro ou vulneráveis a MitM.
+- [ ] **Gestão de Conexões e Pool:** Identifique ausência de timeouts de conexão (`connectionTimeout`, `idleTimeout`), conexões não devolvidas ao pool (*Connection Leak*) e retenção indevida de conexões abertas durante operações lentas de I/O externo.
 - [ ] **Migrações e Schema:** Verifique se as alterações de banco usam scripts versionados (Flyway, Liquibase, Prisma Migrations) e garanta a ausência de opções perigosas ativas em produção (como `auto-ddl`, `synchronize: true` ou `drop-schema`).
 
-### 2. Desempenho e ORM
-- [ ] **N+1 Queries:** Identifique iterações sobre coleções/listas que disparam novas buscas individuais ao banco (falta de `Eager Loading`, `Fetch JOINs` ou paginação adequada).
-- [ ] **Falta de Índices:** Localize consultas com cláusulas `WHERE`, `JOIN` ou `ORDER BY` em colunas que não possuem índices explicitamente mapeados nas migrações/entidades.
-- [ ] **Consultas Sem Paginação:** Identifique buscas globais (`findAll()`, `SELECT *`) sem cláusulas de restrição (`LIMIT` / paginação) que possam estourar a memória RAM (*Out of Memory*).
-- [ ] **Observabilidade:** Verifique se existe suporte a logs de consultas lentas (*Slow Query Log*) sem comprometer dados sensíveis.
+### 2. Prevenção de Injeções e Manipulação de Consultas (OWASP SQLi & NoSQL Prevention)
+- [ ] **SQL Injection Direto:** Identifique concatenação, interpolação de strings (`${...}`, `f"..."`, `+`) ou montagem manual de queries SQL dinâmicas (exigir rigorosamente `Prepared Statements` e queries parametrizadas com bind variables).
+- [ ] **Injeção em Stored Procedures e Dynamic SQL:** Localize procedures, triggers e funções PL/SQL / PL/pgSQL que utilizam comandos de execução dinâmica (`EXECUTE`, `EXECUTE IMMEDIATE`, `sp_executesql`) sem sanitização ou bind parameters adequados.
+- [ ] **NoSQL Operator Injection:** Para bancos NoSQL (MongoDB, DocumentDB), identifique endpoints que passam objetos JSON da requisição diretamente para métodos de busca (ex: `find({ user: req.body.user })`), permitindo injeção de operadores como `{"$gt": ""}`, `{"$ne": null}` ou `{"$regex": "..."}`.
+- [ ] **Injeção em Comandos Redis e Eval:** Identifique execução de comandos arbitrários no Redis via interpolação de chaves não sanitizadas ou uso de `EVAL` com scripts Lua contendo entrada de usuário.
+- [ ] **Segurança de ORMs e Raw Queries:** Identifique métodos de escape em ORMs (ex: `prisma.$queryRawUnsafe`, `sequelize.literal`, `EntityManager.createNativeQuery`, `typeorm.query`) recebendo dados não parametrizados.
 
-### 3. Concorrência e Resiliência (TDD Concorrente)
-- [ ] **Race Conditions:** Identifique operações de leitura-modificação-escrita em recursos compartilhados sem a devida sincronização (Lock Otimista, Lock Pessimista ou atualizações atômicas diretamente no SQL).
-- [ ] **Deadlocks:** Identifique se transações simultâneas tentam alterar múltiplos registros/tabelas em ordem cruzada ou inconsistente.
-- [ ] **Idempotência e Retry:** Verifique se existem mecanismos de retry com *backoff* exponencial para falhas de transação transitórias (como deadlocks aleatórios) em operações críticas.
+### 3. Proteção Criptográfica e Prevenção de Vazamentos (OWASP Cryptographic Storage)
+- [ ] **Criptografia de Colunas Sensíveis em Repouso (Field-Level Encryption):** Verifique se dados altamente confidenciais (PII, números de cartão, dados de saúde, chaves privadas, segredos) estão salvos em texto puro no banco em vez de utilizarem criptografia autenticada (ex: AES-256-GCM / ChaCha20-Poly1305) com chaves gerenciadas em cofre seguro (KMS).
+- [ ] **Vazamento via Logs de Banco e Queries:** Identifique se queries SQL completas contendo parâmetros sensíveis ou dados PII são impressas em arquivos de log sem mascaramento (*Data Masking / Redaction*).
+- [ ] **Vazamento via Serialização/APIs (Excessive Exposure):** Verifique se entidades do banco/ORM são retornadas diretamente em controllers/endpoints HTTP sem o uso de DTOs, Mappers ou anotações de exclusão (ex: `@JsonIgnore`, `select: false`), expondo colunas internas na resposta JSON.
+- [ ] **Vazamento em Tratamento de Exceções:** Identifique se erros SQL nativos, violações de integridade referencial ou *stack traces* de banco são expostos diretamente no payload HTTP de erro para o cliente.
 
-### 4. Segurança do Banco e Prevenção de Vazamentos (Data Leakage)
-- [ ] **SQL Injection:** Identifique concatenação ou interpolação manual de strings em instruções SQL (exigir rigorosamente `Prepared Statements` / queries parametrizadas).
-- [ ] **Credenciais e Dados Sensíveis:** Verifique senhas ou chaves hardcoded no código, ausência de criptografia TLS/SSL na conexão com o banco e dados sensíveis (PII, segredos) salvos em texto puro nas tabelas.
-- [ ] **Vazamento via Logs (PII Leakage):** Identifique se objetos completos de banco, DTOs com dados sensíveis (senhas, cartões, CPF) ou parâmetros de busca estão sendo gravados em arquivos de log em texto claro.
-- [ ] **Vazamento via Serialização/APIs:** Verifique se entidades do banco/ORM são retornadas diretamente em controllers/endpoints HTTP sem o uso de DTOs, Mappers ou anotações de exclusão (ex: `@JsonIgnore`, `select: false`), expondo colunas internas na resposta JSON.
-- [ ] **Vazamento em Tratamento de Exceções:** Identifique se erros SQL nativos, exceções do ORM ou *stack traces* completos são expostos diretamente no payload HTTP de erro para o cliente.
-- [ ] **Mass Assignment:** Identifique se payloads de requisições de criação/atualização são injetados diretamente nas entidades do banco sem filtro explícito de campos permitidos (*whitelisting*).
+### 4. Limites de Transação, Concorrência e Performance (DDD / ADD / TDD Concorrente)
+- [ ] **Dual Write & Consistência:** Identifique escritas sequenciais em múltiplos bancos/serviços (ex: SQL + Redis, SQL + Kafka) no mesmo fluxo sem padrões de resiliência (Transactional Outbox ou CDC).
+- [ ] **Escopo e Duração de Transações:** Identifique transações SQL que abraçam chamadas lentas de rede (APIs de terceiros, envios de e-mail, microserviços), retendo locks e conexões desnecessariamente.
+- [ ] **Race Conditions & Concorrência:** Identifique operações de leitura-modificação-escrita em recursos compartilhados (saldo, estoque, contadores) sem controle concorrente explícito (Lock Otimista via `@Version`/coluna de versão, Lock Pessimista `SELECT ... FOR UPDATE` ou updates atômicos no SQL).
+- [ ] **Deadlocks e Ordem de Acesso:** Verifique se transações simultâneas alteram múltiplos registros/tabelas em ordem cruzada ou inconsistente.
+- [ ] **N+1 Queries e Consultas Sem Paginação:** Identifique buscas N+1 em laços de repetição (falta de `Fetch JOINs` / `include`) e consultas globais (`findAll()`, `SELECT *`) sem restrição de paginação com teto máximo (`LIMIT`).
 
 ---
 
@@ -49,14 +50,15 @@ Ao final da auditoria, você deve listar os achados no terminal e gerar um relat
 Ao finalizar a análise técnica no código, exiba no chat a lista detalhada de achados (arquivo por arquivo, linha por linha), ordenada por prioridade:
 
 ### PARTE 1: MATRIZ DE PRIORIZAÇÃO E QUICK WINS
-Apresente uma tabela inicial contendo TODOS os achados encontrados, ordenados obrigatoriamente do maior risco/facilidade para o menor:
+Apresente uma tabela inicial contendo TODOS os achados encontrados:
 
 | ID | Arquivo / Ponto | Categoria | Severidade | Esforço Estimado | Quick Win? |
 |---|---|---|---|---|---|
-| #1 | `caminho/arquivo.ext:42` | Segurança | CRÍTICA | Baixo (15 min) | **SIM** |
-| #2 | `caminho/outro.ext:105` | Performance | ALTA | Médio (2 hrs) | NÃO |
+| #1 | `src/repositories/userRepo.ts:42` | OWASP SQLi | CRÍTICA | Baixo (15 min) | **SIM** |
+| #2 | `config/database.ts:18` | Acesso (Superuser / No TLS) | ALTA | Baixo (20 min) | **SIM** |
+| #3 | `src/services/walletService.ts:105` | Concorrência (Race Condition) | ALTA | Médio (2 hrs) | NÃO |
 
-*(Quick Win: Problema de Severidade ALTA ou MÉDIA com Esforço de Correção BAIXO).*
+*(Quick Win: Problema de Severidade ALTA ou CRÍTICA com Esforço de Correção BAIXO).*
 
 ### PARTE 2: DETALHAMENTO COMPLETO DOS ACHADOS
 Para CADA item listado na tabela, forneça a análise completa:
@@ -65,44 +67,42 @@ Para CADA item listado na tabela, forneça a análise completa:
 - **Esforço de Correção:** [BAIXO | MÉDIO | ALTO]
 - **Tag:** [QUICK WIN] *(se aplicável)*
 - **Arquivo/Linha:** `caminho/do/arquivo.ext:linha`
-- **Categoria:** [DDD / ADD / TDD Concorrente / Segurança e Vazamentos / Performance / Migrações]
-- **Problema:** Explicação direta do risco real em produção.
-- **Evidência:** Trecho do código-fonte atual.
-- **Correção Recomendada:** Código devidamente corrigido.
+- **Categoria:** [OWASP SQLi / NoSQL Injection / Database Access Control / Cryptographic Storage / Concorrência & Locks / Performance & N+1]
+- **Vetor de Exploração / Risco:** Explicação direta de como essa vulnerabilidade pode ser explorada ou causar indisponibilidade/vazamento em produção.
+- **Evidência:** Trecho do código-fonte atual identificado no repositório.
+- **Correção Recomendada:** Código devidamente refatorado aplicando as melhores práticas do OWASP Database Security.
 
 ---
 
 ## GERAÇÃO DO RELATÓRIO EM PDF E ISSUES
 
-DEPOIS DA AUDITORIA, crie e execute um script para gerar um RELATÓRIO EM PDF, visualmente amigável, em pt-BR, salvo em `docs/security-audit/relatorio-auditoria-seguranca.pdf`, contendo:
+DEPOIS DA AUDITORIA, crie e execute um script para gerar um RELATÓRIO EM PDF, visualmente amigável, em pt-BR, salvo em `docs/database-audit/relatorio-auditoria-banco.pdf`, contendo:
 
-a) **Capa:** Título "Relatório de Auditoria de Banco de Dados e Segurança — <nome do projeto>", data, escopo auditado e nota metodológica (como cada categoria foi mapeada para a stack detectada).
-b) **Resumo Executivo:** Total de achados por severidade, gráfico de rosca por severidade e gráfico de barras por categoria. 
+a) **Capa:** Título "Relatório de Auditoria de Banco de Dados e Segurança (OWASP DB Security) — <nome do projeto>", data, escopo auditado e nota metodológica.
+b) **Resumo Executivo:** Total de achados por severidade, gráfico de rosca por severidade e gráfico de barras por categoria OWASP. 
    - **Paleta oficial:** Crítica `#B91C1C`, Alta `#EA580C`, Média `#D97706`, Baixa `#2563EB`, Ponto Forte `#059669`.
-c) **Pontos Fortes** (o que está protegido, com evidência) e **Pontos Fracos** (os riscos centrais).
-d) **Tabela de Achados Detalhados por Categoria:** Severidade | Arquivo:linha | Descrição, com indicação/chip de severidade e tag de Quick Win.
-e) **Recomendações Priorizadas** (P1, P2, P3...).
-f) **Seção Final "ISSUES PARA O GITHUB":** Para cada achado acionável, o texto COMPLETO de uma issue em Markdown, pronto para copiar e colar, dentro de um bloco delimitado (ex: entre `--- ISSUE n ---` e `--- FIM ISSUE n ---`). Cada issue deve conter:
-   - Título no formato `[Segurança/Banco] <descrição curta da falha>`
-   - Labels sugeridas: `security` ou `database` + severidade
-   - Descrição do problema e por que é explorável / impacta a produção
+c) **Pontos Fortes** (o que está protegido no banco, com evidência) e **Pontos Fracos** (os riscos centrais).
+d) **Matriz de Conformidade OWASP DB:** Tabela indicando status para cada pilar do OWASP Database Security Cheat Sheet.
+e) **Tabela de Achados Detalhados por Categoria:** Severidade | Arquivo:linha | Descrição, com indicação/chip de severidade e tag de Quick Win.
+f) **Recomendações Priorizadas** (P1, P2, P3...).
+g) **Seção Final "ISSUES PARA O GITHUB":** Para cada achado acionável, o texto COMPLETO de uma issue em Markdown, pronto para copiar e colar, dentro de um bloco delimitado (ex: entre `--- ISSUE n ---` e `--- FIM ISSUE n ---`). Cada issue deve conter:
+   - Título no formato `[Database/Segurança] <descrição curta da falha>`
+   - Labels sugeridas: `database`, `security`, `performance` + severidade
+   - Descrição do problema e cenário de exploração
    - Evidência: `arquivo:linha` com trecho de código
-   - Impacto
-   - Sugestão de correção
+   - Impacto (ex: injeção de dados, exfiltração de dados confidenciais, deadlock em produção)
+   - Sugestão de correção com código seguro
    - Critérios de aceite (checklist verificável)
-   *(Nota: Agrupe achados triviais relacionados numa issue única quando fizer sentido para evitar spam).*
 
 ### REGRAS TÉCNICAS PARA GERAÇÃO DO PDF
-- Não instale pacotes globalmente no sistema. Use um ambiente isolado (ex: `venv` Python com `reportlab` + `matplotlib`, ou ferramentas equivalentes locais como `puppeteer`/HTML-to-PDF).
-- Deixe o script gerador salvo no diretório `docs/security-audit/` para que o relatório possa ser regerado futuramente.
-- Verifique o PDF gerado: garanta o número correto de páginas, a renderização adequada dos gráficos e a legibilidade das tabelas.
-- Formatação das páginas: tamanho A4, margens de aproximadamente 2cm, cabeçalho e rodapé contendo o nome do relatório e a numeração de páginas.
+- Use ambiente Python isolado (`venv` com `reportlab` + `matplotlib`).
+- Salve o script gerador em `docs/database-audit/generate_report.py`.
+- Formatação das páginas: tamanho A4, margens de 2cm, cabeçalho e rodapé contendo o nome do relatório e a numeração de páginas.
 
 ---
 
 ## ENTREGÁVEIS FINAIS
-
 Ao concluir todas as etapas, informe no chat:
 1. A confirmação de geração do relatório em PDF.
 2. A lista de achados no chat (Parte 1 e Parte 2).
-3. O caminho relativo de todos os arquivos gerados (ex: `docs/security-audit/relatorio-auditoria-seguranca.pdf`, `docs/security-audit/generate_report.py`).
+3. O caminho relativo de todos os arquivos gerados (ex: `docs/database-audit/relatorio-auditoria-banco.pdf`, `docs/database-audit/generate_report.py`).

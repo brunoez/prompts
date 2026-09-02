@@ -5,6 +5,43 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/lang/pt-BR/).
 
+## [1.1.0] - 2026-09-02
+
+### Adicionado & Aprimorado (Alinhamento OWASP ASTF 2023 & OWASP Cheat Sheet Series)
+- **Segurança de APIs (`api.md`):**
+  - Alinhamento 100% à suíte de 16 módulos do **OWASP API Security Testing Framework (ASTF)** e **OWASP API Security Top 10 2023**.
+  - Auditoria especializada para **GraphQL** (Introspecção, Query Depth/Complexity, Batching), **gRPC** (Reflection, Auth Interceptors), **LLM/AI Endpoints** (Prompt Injection, Unbounded Tool Calling) e **ReDoS**.
+  - Matriz de testes de autorização cruzada com dois tokens para eliminação de falsos negativos em BOLA e BFLA.
+  - Detecção de *OpenAPI Drift* e *Shadow/Zombie APIs* (ASTF-API9).
+  - Suporte à geração de relatórios no padrão **SARIF v2.1.0** para integração nativa com o GitHub Code Scanning.
+- **Banco de Dados & Concorrência (`db.md`):**
+  - Incorporação do *OWASP Database Security*, *SQLi Prevention*, *NoSQL Injection* e *Database Access Control Cheat Sheets*.
+  - Princípio do Menor Privilégio no DB (detecção de conexões com superusuários vs roles DML segregadas).
+  - Enforcement obrigatório de TLS (`sslmode=verify-full`), criptografia de campos sensíveis em repouso (Field-Level Encryption / KMS) e auditoria de procedures dinâmicas.
+- **Gestão de Segredos & Criptografia (`secrets.md`):**
+  - Incorporação do *OWASP Password Storage* e *Secrets Management Cheat Sheets*.
+  - Padrão ouro para hashing de senhas: `Argon2id` ($\ge 64\,\text{MB}$, 3 iterações, 4 threads), `scrypt`, `bcrypt` ($\ge 12$) ou `PBKDF2` ($\ge 600.000$ iterações), com banimento de `MD5`/`SHA-1`/`SHA-256` cru.
+  - Arquitetura de Salt CSPRNG + Pepper gerenciado em cofre KMS e prevenção contra *Timing Attacks* (`crypto.timingSafeEqual`).
+- **Lógica de Negócio & Integridade (`business.md`):**
+  - Incorporação do *OWASP Business Logic Security* e *Transaction Authorization Cheat Sheets*.
+  - Chaves de idempotência (`Idempotency-Key`) e locks distribuídos contra *double charges*.
+  - Proteção contra manipulação de preços/quantidades, poluição de parâmetros HTTP (HPP), ataques de repetição temporal e ausência de trilhas de auditoria imutáveis.
+- **Modelagem de Ameaças (`threat_modeling.md`):**
+  - Incorporação do *OWASP Threat Modeling Cheat Sheet* e do Manifesto de Threat Modeling (As 4 Perguntas Fundamentais).
+  - Decomposição formal **STRIDE-per-Element** (Processo, Armazenamento, Fluxo e Entidade Externa), mapeamento de *Trust Boundaries* e scoring CVSS/DREAD.
+- **Security-Driven Development & Abuse Cases (`secdd_abuse_cases.md`):**
+  - Incorporação do *OWASP Abuse Case Cheat Sheet* e testes defensivos automatizados.
+  - Testes negativos de autorização cruzada (Cross-Tenant BOLA), simulações de concorrência maliciosa (*Limit-Overrun*) e testes de ReDoS em validadores.
+- **Frontend & SPAs (`frontend.md`):**
+  - Incorporação do *OWASP Client-Side Security*, *DOM-based XSS*, *CSP* e *Clickjacking Cheat Sheets*.
+  - Suporte à **Trusted Types API** (`require-trusted-types-for 'script'`), validação de `window.postMessage`, prefixos de cookies seguros (`__Host-` e `__Secure-`) e mitigação de *Client-Side Prototype Pollution*.
+- **Supply Chain & Dependências (`supply_chain.md`):**
+  - Incorporação do **OWASP SCVS** (*Software Component Verification Standard*) e *Vulnerable Dependency Management*.
+  - Geração e conformidade de SBOM (**CycloneDX** e **SPDX**), prevenção de *Dependency Confusion*, detecção de alucinação de pacotes (*Slopsquatting*) e builds determinísticos com `--ignore-scripts`.
+- **Segurança em CI/CD (`cicd_pipeline.md`):**
+  - Incorporação do *OWASP CI/CD Security Cheat Sheet*.
+  - Prevenção de script injection via contextos de workflow, autenticação via **OIDC**, pinning imutável de Actions por **Full Commit SHA-256** e isolamento de runners.
+
 ## [1.0.0] - 2026-09-01
 
 ### Adicionado
