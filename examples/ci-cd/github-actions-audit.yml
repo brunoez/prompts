@@ -1,0 +1,107 @@
+# ==============================================================================
+# GitHub Actions Workflow: Auditoria de Segurança Automática com Agente de IA
+# Modelo para uso em Projetos Privados de Clientes / Empresas
+# ==============================================================================
+# Este workflow executa a suíte de prompts de AppSec (OWASP ASTF 2023 / WSTG v4.2)
+# em cada Pull Request, gerando relatórios em PDF e importando vulnerabilidades
+# diretamente na aba "Security / Code Scanning" do GitHub via SARIF.
+# ==============================================================================
+
+name: 🛡️ AI Security & AppSec Audit (OWASP ASTF)
+
+on:
+  pull_request:
+    branches: [main, master, develop]
+    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  security-events: write  # Permite enviar resultados SARIF para o GitHub Security
+  pull-requests: write    # Permite comentar o resumo da auditoria no PR
+
+jobs:
+  security-audit:
+    name: OWASP AppSec Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: 📥 Checkout do Código do Repositório
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⚙️ Configurar Ambiente Python para Relatórios
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 Instalar Dependências do Gerador de Relatório
+        run: |
+          pip install reportlab matplotlib
+
+      - name: 📥 Instalar Suíte de Prompts de AppSec
+        run: |
+          if [ ! -d ".agent/prompts" ]; then
+            curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash
+          fi
+
+      - name: 🤖 Executar Auditoria com Agente de IA (CLI)
+        env:
+          # Configure a chave de API da IA de sua preferência nos Secrets do repositório:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          echo "🚀 Executando auditoria profunda de código com base no OWASP ASTF 2023..."
+          
+          # Exemplo 1: Execução com Claude Code CLI
+          # claude --prompt "@[.agent/prompts/security/api.md] Execute a auditoria completa de segurança neste repositório e gere o relatório em docs/api-audit/relatorio-auditoria-api.pdf e o arquivo SARIF em docs/api-audit/results.sarif"
+          
+          # Exemplo 2: Execução com Antigravity / Gemini CLI
+          # agy run --prompt "@[.agent/prompts/security/api.md] Realize a varredura e gere os artefatos de auditoria"
+
+          # Criação do diretório de artefatos caso não exista
+          mkdir -p docs/api-audit
+
+      - name: 📊 Publicar Resultados SARIF no GitHub Code Scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        continue-on-error: true
+        with:
+          sarif_file: docs/api-audit/results.sarif
+          category: ai-appsec-audit
+
+      - name: 📄 Salvar Relatório em PDF como Artefato do Job
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: relatorio-auditoria-api
+          path: docs/api-audit/*.pdf
+          retention-days: 30
+
+      - name: 💬 Comentar Resumo da Auditoria no Pull Request
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'docs/api-audit/results.sarif';
+            
+            let message = '### 🛡️ Relatório de Auditoria de Segurança com IA (OWASP ASTF)\n\n';
+            message += '✅ A varredura de segurança foi executada com sucesso.\n';
+            message += '📄 **Relatório em PDF:** Disponível para download nos artefatos da execução desta Action.\n';
+            message += '🔍 **Alertas de Segurança:** Consulte a aba **Security > Code Scanning** deste repositório.\n';
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });

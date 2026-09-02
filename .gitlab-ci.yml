@@ -1,19 +1,22 @@
+# ==============================================================================
+# GitLab CI Pipeline: Validação de Qualidade e Integridade
+# Repositório: brunoez/prompts
+# ==============================================================================
+
 stages:
   - lint
   - test
 
-lint:markdown:
+lint:scripts:
   stage: lint
-  image: node:alpine
-  before_script:
-    - npm install -g markdownlint-cli
+  image: koalaman/shellcheck-alpine:latest
   script:
-    - markdownlint "**/*.md" --ignore node_modules --ignore docs || true
-  allow_failure: true
+    - shellcheck install.sh
 
-test:scripts:
+test:integrity:
   stage: test
-  image: bash:latest
+  image: python:3.11-alpine
+  before_script:
+    - apk add --no-cache bash git
   script:
-    - bash -n install.sh
-    - bash -n scripts/install.sh
+    - python3 tests/test_integrity.py

@@ -4,13 +4,13 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![GitHub Release](https://img.shields.io/github/v/release/brunoez/prompts?color=blue)](https://github.com/brunoez/prompts/releases/latest)
-[![GitHub Stars](https://img.shields.io/github/stars/brunoez/prompts?style=social)](https://github.com/brunoez/prompts)
+[![CI Status](https://github.com/brunoez/prompts/actions/workflows/ci.yml/badge.svg)](https://github.com/brunoez/prompts/actions)
 [![GitLab CI](https://img.shields.io/badge/GitLab%20CI-Passing-22c55e?logo=gitlab)](.gitlab-ci.yml)
 [![Language](https://img.shields.io/badge/Language-pt--BR-009c3b.svg)](README.md)
 
 **A biblioteca definitiva de prompts estruturados de auditoria profunda, arquitetura defensiva e metodologias *Driven Development* para desenvolvedores, arquitetos e agentes de Inteligência Artificial.**
 
-[Instalação Rápida](#-instalação-rápida) • [Qual Prompt Usar?](#-qual-prompt-usar-guia-de-ação-rápida-com-exemplos) • [Catálogo Completo](#-catálogo-completo-de-prompts) • [Contribuição](CONTRIBUTING.md)
+[Instalação Rápida](#-instalação-rápida) • [Uso em CI/CD Privado](#-como-executar-os-prompts-em-cicd-no-seu-projeto-privado) • [Qual Prompt Usar?](#-qual-prompt-usar-guia-de-ação-rápida-com-exemplos) • [Catálogo Completo](#-catálogo-completo-de-prompts) • [Contribuição](CONTRIBUTING.md)
 
 </div>
 
@@ -20,7 +20,7 @@
 
 Criado com foco na comunidade brasileira de desenvolvimento e AppSec, este repositório aberto reúne **prompts técnicos de alto nível** projetados para serem executados por Engenheiros Principais ou Agentes de IA (Antigravity, Cursor, Windsurf, Claude Code, GitHub Copilot).
 
-O objetivo é transformar a velocidade do **Vibe Coding** em software de **nível corporativo**: seguro contra vulnerabilidades (**OWASP ASTF 2023** e **OWASP Cheat Sheet Series**), arquiteturalmente consistente (DDD/SDD), resiliente em produção (SRE) e 100% testado (TDD, BDD, SecDD).
+O objetivo é transformar a velocidade do **Vibe Coding** em software de **nível corporativo**: seguro contra vulnerabilidades (**OWASP ASTF 2023**, **WSTG v4.2** e **OWASP Cheat Sheet Series**), arquiteturalmente consistente (DDD/SDD), resiliente em produção (SRE) e 100% testado (TDD, BDD, SecDD).
 
 ---
 
@@ -60,7 +60,7 @@ seu-projeto/
 │   │   ├── tdd_test_driven.md         # TDD Red-Green-Refactor
 │   │   ├── test_suite_generator.md    # Gerador de Testes QA
 │   │   └── technical_documentation.md # Docs-as-Code & C4
-│   ├── security/                 # Auditorias de AppSec (OWASP ASTF)
+│   ├── security/                 # Auditorias de AppSec (OWASP ASTF / WSTG)
 │   │   ├── ai_appsec.md               # OWASP LLM Top 10
 │   │   ├── api.md                     # OWASP API Top 10 (ASTF)
 │   │   ├── business.md                # Fraudes & Idempotência
@@ -79,6 +79,19 @@ seu-projeto/
 ├── CONTEXT.md                    # Dicionário do negócio
 └── CLAUDE.md / .cursorrules      # Regras de IA do projeto
 ```
+
+---
+
+## 🤖 Como Executar os Prompts em CI/CD no seu Projeto Privado
+
+Você pode integrar a suíte de prompts na esteira de CI/CD da sua empresa para que um **Agente de IA audite automaticamente cada Pull Request**, gere o relatório em PDF e publique vulnerabilidades na aba **Security / Code Scanning** do GitHub via **SARIF**.
+
+Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`](examples/ci-cd/):
+
+* **GitHub Actions:** [`examples/ci-cd/github-actions-audit.yml`](examples/ci-cd/github-actions-audit.yml)  
+  *Executa o agente em Pull Requests, publica o arquivo `results.sarif` na aba Security e salva o PDF como artefato de build.*
+* **GitLab CI:** [`examples/ci-cd/gitlab-ci-audit.yml`](examples/ci-cd/gitlab-ci-audit.yml)  
+  *Integração nativa com GitLab SAST reports e retenção de relatórios PDF.*
 
 ---
 

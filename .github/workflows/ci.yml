@@ -1,0 +1,73 @@
+# ==============================================================================
+# GitHub Actions CI: Validação de Qualidade, Integridade e Segurança
+# Repositório: brunoez/prompts
+# ==============================================================================
+
+name: 🚀 CI — Quality, Integrity & Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint-and-syntax:
+    name: 🔍 ShellCheck & Syntax Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐚 ShellCheck no Instalador
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          shellcheck install.sh
+
+      - name: 📝 Validação de Sintaxe Bash
+        run: |
+          bash -n install.sh
+
+  integrity-tests:
+    name: 🧪 Suíte de Testes de Integridade
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 🚀 Executar Bateria de Testes
+        run: |
+          python3 tests/test_integrity.py
+
+  secret-scan:
+    name: 🔐 Verificação de Segredos (Gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: 📥 Checkout Completo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🛡️ Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
