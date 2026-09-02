@@ -84,14 +84,21 @@ seu-projeto/
 
 ## 🤖 Como Executar os Prompts em CI/CD no seu Projeto Privado
 
-Você pode integrar a suíte de prompts na esteira de CI/CD da sua empresa para que um **Agente de IA audite automaticamente cada Pull Request**, gere o relatório em PDF e publique vulnerabilidades na aba **Security / Code Scanning** do GitHub via **SARIF**.
+Você pode integrar a suíte de prompts na esteira de CI/CD da sua empresa para que um **Agente de IA audite automaticamente cada Pull Request**, gere o relatório em PDF, publique vulnerabilidades na aba **Security / Code Scanning** do GitHub via **SARIF** e abra tickets automáticos no seu gerenciador de tarefas.
 
 Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`](examples/ci-cd/):
 
+### 📋 Pipelines Prontos
 * **GitHub Actions:** [`examples/ci-cd/github-actions-audit.yml`](examples/ci-cd/github-actions-audit.yml)  
-  *Executa o agente em Pull Requests, publica o arquivo `results.sarif` na aba Security e salva o PDF como artefato de build.*
+  *Executa o agente em Pull Requests, publica o arquivo `results.sarif` na aba Security, salva o PDF como artefato de build e sincroniza com GitHub Issues / Jira.*
 * **GitLab CI:** [`examples/ci-cd/gitlab-ci-audit.yml`](examples/ci-cd/gitlab-ci-audit.yml)  
-  *Integração nativa com GitLab SAST reports e retenção de relatórios PDF.*
+  *Integração nativa com GitLab SAST reports, retenção de relatórios PDF e sincronização com GitLab Issues & Boards.*
+
+### 🎫 Sincronizadores Automáticos de Tickets (Zero Duplicatas)
+* **GitHub Issues:** [`examples/ci-cd/github_issues_sync.py`](examples/ci-cd/github_issues_sync.py) — Cria issues detalhadas com labels `severity:critical`/`high` de forma nativa via `${{ secrets.GITHUB_TOKEN }}`.
+* **GitLab Issues & Boards:** [`examples/ci-cd/gitlab_issues_sync.py`](examples/ci-cd/gitlab_issues_sync.py) — Cria issues no GitLab com scoped labels (`severity::critical`) para quadros de gestão.
+* **Jira (Atlassian):** [`examples/ci-cd/jira_sync.py`](examples/ci-cd/jira_sync.py) — Cria cards de Bug via Jira REST API v3 com formatação rica ADF e consulta JQL anti-duplicação.
+* 📖 **Guia Completo de Configuração:** Consulte o [`examples/ci-cd/README.md`](examples/ci-cd/README.md) para o passo a passo de configuração de tokens e secrets.
 
 ---
 
