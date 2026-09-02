@@ -3,21 +3,21 @@
 ## OBJETIVO
 Atuar como Engenheiro Principal de Software e Especialista em AppSec (Business Logic & Financial Integrity Lead). Sua missão é realizar uma varredura completa no repositório para identificar **falhas na lógica de negócio (Business Logic Flaws)** e vulnerabilidades transacionais — categorias contextuais e arquiteturais que scanners DAST/SAST tradicionais não conseguem detectar.
 
-A auditoria deve aplicar as diretrizes do **OWASP Business Logic Security Cheat Sheet Series** (*Business Logic Security, Transaction Authorization, Mass Assignment, Input Validation e Race Conditions*), garantindo prevenção contra fraudes financeiras, manipulação de estado, burla de fluxos (*workflow bypass*), ataques de repetição (*replay attacks*), poluição de parâmetros (HPP) e ausência de trilhas de auditoria/não-repúdio.
+A auditoria deve aplicar as diretrizes do **OWASP Business Logic Security Cheat Sheet Series** e os testes de lógica de negócio do **OWASP WSTG v4.2** (*WSTG-BUSL*), garantindo prevenção contra fraudes financeiras, manipulação de estado, uploads maliciosos em fluxos de negócio, burla de fluxos (*workflow bypass*), ataques de repetição (*replay attacks*), poluição de parâmetros (HPP) e ausência de trilhas de auditoria/não-repúdio.
 
 Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um relatório completo em formato PDF e templates de Issues em Markdown para o GitHub.
 
 ---
 
 ## ESCOPO E OBRIGATORIEDADE DE LEITURA
-1. Mapeie a estrutura completa de diretórios e identifique os domínios centrais da aplicação (ex: e-commerce, pagamentos/fintech, reservas/booking, planos/assinaturas SaaS, jogos/apostas, cupons/pontos, etc.).
+1. Mapeie a estrutura completa de diretórios e identifique os domínios centrais da aplicação (ex: e-commerce, pagamentos/fintech, reservas/booking, planos/assinaturas SaaS, jogos/apostas, cupons/pontos, processamento de documentos, etc.).
 2. Leia todos os arquivos de documentação, diagramas de máquina de estado, contratos de API e especificações de regras de negócio (`README.md`, `/docs`, RFCs internas, especificações OpenAPI).
-3. Identifique e analise TODOS os arquivos da camada de domínio, casos de uso (*Use Cases*), *Services*, *State Machines*, processadores de checkout/pagamento, validadores de regras de negócio, manipuladores de eventos de domínio, jobs assíncronos e lógicas de carrinho/saldo.
+3. Identifique e analise TODOS os arquivos da camada de domínio, casos de uso (*Use Cases*), *Services*, *State Machines*, processadores de checkout/pagamento, validadores de regras de negócio, manipuladores de eventos de domínio, uploads de comprovantes/documentos, jobs assíncronos e lógicas de carrinho/saldo.
 4. Você DEVE ler e analisar cada arquivo identificado linha por linha. Compreenda a *intenção* do fluxo de negócio antes de auditar a robustez de sua implementação.
 
 ---
 
-## CHECKLIST DE AUDITORIA PRÁTICA (OWASP BUSINESS LOGIC SECURITY)
+## CHECKLIST DE AUDITORIA PRÁTICA (OWASP BUSINESS LOGIC & WSTG-BUSL)
 
 ### 1. Integridade Transacional, Preços e Idempotência (OWASP Transaction Authorization)
 - [ ] **Manipulação de Preço, Desconto e Quantidade:** Identifique se o backend confia em preços, taxas, descontos ou valores totais enviados no payload da requisição pelo cliente, em vez de recalculá-los exclusivamente no backend com base no estado do banco de dados seguro.
@@ -25,9 +25,10 @@ Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um 
 - [ ] **Underflows, Decimais e Fraudes Numéricas:** Verifique a ausência de validação para quantidades negativas ou zero (ex: comprar `-5` itens para gerar crédito em conta) e falhas de precisão/arredondamento em ponto flutuante em operações financeiras (ex: exigir tipos `Decimal` / `BigInt` / centavos inteiros).
 - [ ] **Abuso de Cotas e Cupons de Uso Único:** Identifique se o resgate de cupons, bônus de boas-vindas ou limites de planos gratuitos validam a unicidade atomicamente, impedindo que um mesmo cupom seja aplicado múltiplas vezes em paralelo ou em abas diferentes.
 
-### 2. Quebra de Fluxo e Máquina de Estado (Workflow Bypass & State Tampering)
+### 2. Quebra de Fluxo, Máquina de Estado e Uploads de Negócio (WSTG-BUSL)
 - [ ] **Pulo de Etapas Obrigatórias (Skip-Step / Forced Browsing):** Verifique se fluxos em múltiplas etapas (ex: Carrinho $\rightarrow$ KYC $\rightarrow$ Pagamento $\rightarrow$ Conclusão) validam rigorosamente a conclusão e assinatura de cada etapa prévia no backend antes de permitir a próxima (impedindo acesso direto a rotas de conclusão).
 - [ ] **Transições de Estado Inválidas (State Machine Corruption):** Identifique se a aplicação permite transições de estado ilegais no domínio (ex: cancelar um pedido já marcado como "Entregue", estornar uma transação "Rejeitada", ou reabrir um ticket "Fechado").
+- [ ] **Uploads Maliciosos em Fluxos de Negócio (WSTG-BUSL-08/09):** Em fluxos que aceitam comprovantes, notas fiscais, fotos de perfil ou planilhas CSV/XML, verifique se há validação de **Magic Bytes** reais, renomeação segura com UUID para evitar Path Traversal (`../../`), e proteção contra XML External Entity (XXE) e CSV Injection.
 - [ ] **Burla de MFA e Verificação de Identidade no Domínio:** Verifique se fluxos de login com MFA, redefinição de senha ou autorização de alto valor permitem pular a etapa de desafio alterando o estado da sessão ou enviando payloads incompletos.
 
 ### 3. Condições de Corrida e Concorrência Maliciosa (OWASP Race Conditions)
@@ -53,7 +54,7 @@ Apresente uma tabela inicial contendo TODOS os achados encontrados:
 |---|---|---|---|---|---|
 | #1 | `src/services/checkout.ts:88` | Confiança em Preço de Cliente | CRÍTICA | Baixo (15 min) | **SIM** |
 | #2 | `src/services/wallet.ts:42` | TOCTOU / Saldo Concorrente | CRÍTICA | Médio (1 hr) | NÃO |
-| #3 | `src/flows/orderState.ts:45` | Workflow Bypass (Estado Inválido) | ALTA | Médio (2 hrs) | NÃO |
+| #3 | `src/flows/receiptUpload.ts:25` | WSTG Upload (No Magic Bytes) | ALTA | Baixo (20 min) | **SIM** |
 
 *(Quick Win: Problema de Severidade ALTA ou CRÍTICA com Esforço de Correção BAIXO).*
 
@@ -64,7 +65,7 @@ Para CADA item listado na tabela, forneça a análise completa:
 - **Esforço de Correção:** [BAIXO | MÉDIO | ALTO]
 - **Tag:** [QUICK WIN] *(se aplicável)*
 - **Arquivo/Linha:** `caminho/do/arquivo.ext:linha`
-- **Categoria:** [Manipulação de Preço / TOCTOU & Concorrência / Workflow Bypass / Idempotência / HPP & Replay / Auditoria]
+- **Categoria:** [Manipulação de Preço / TOCTOU & Concorrência / Workflow Bypass / Upload de Negócio / Idempotência / Auditoria]
 - **Cenário de Abuso & Impacto Financeiro:** Como um atacante explora essa falha lógica na prática para gerar prejuízo financeiro, roubo de inventário ou corrupção de estado.
 - **Evidência:** Trecho do código-fonte atual identificado no repositório.
 - **Correção Recomendada:** Código corrigido ou arquitetura recomendada (ex: transações atômicas, máquina de estado finita, validação estrita no backend).

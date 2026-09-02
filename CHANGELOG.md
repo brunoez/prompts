@@ -5,6 +5,22 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/lang/pt-BR/).
 
+## [1.1.1] - 2026-09-02
+
+### Adicionado (Inclusões Cirúrgicas do OWASP WSTG v4.2)
+- **Validação de Uploads Seguros de Arquivos (`api.md` & `business.md` - WSTG-BUSL-08/09):**
+  - Inclusão de checagem obrigatória de Magic Bytes reais, sanitização de nome com UUID contra Path Traversal (`../../`) e isolamento de storage.
+- **Directory / Path Traversal em I/O (`api.md` - WSTG-ATHZ-01):**
+  - Checagem de confinamento de diretório raiz em leituras locais de arquivo (`fs.readFile`, `res.sendFile`, `open()`).
+- **Server-Side Template Injection / SSTI (`api.md` & `frontend.md` - WSTG-INPV-18):**
+  - Detecção de interpolação de strings não sanitizadas no corpo de templates de e-mail e renderização no servidor (SSR).
+- **Segurança de WebSockets & CSWSH (`api.md` & `frontend.md` - WSTG-CLNT-10):**
+  - Validação de cabeçalho `Origin` no handshake de WebSocket para mitigar Cross-Site WebSocket Hijacking.
+- **Session Fixation & Account Enumeration (`secrets.md` & `api.md` - WSTG-SESS-03 / IDNT-04):**
+  - Regeneração obrigatória de Session ID após login e tempos/mensagens homogêneas em endpoints de autenticação.
+- **CORS Dynamic Regex Hardening (`api.md` - WSTG-CLNT-07):**
+  - Prevenção de bypass de CORS por regexes com pontos não escapados em validações dinâmicas de origem.
+
 ## [1.1.0] - 2026-09-02
 
 ### Adicionado & Aprimorado (Alinhamento OWASP ASTF 2023 & OWASP Cheat Sheet Series)

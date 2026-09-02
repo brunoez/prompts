@@ -1,9 +1,9 @@
-# PROMPT DE AUDITORIA COMPLETA: GESTÃO DE SEGREDOS, ARMAZENAMENTO DE SENHAS (OWASP PASSWORD STORAGE), CRIPTOGRAFIA E SCANNER AUTOMATIZADO
+# PROMPT DE AUDITORIA COMPLETA: GESTÃO DE SEGREDOS, ARMAZENAMENTO DE SENHAS (OWASP PASSWORD STORAGE & WSTG), CRIPTOGRAFIA E SCANNER AUTOMATIZADO
 
 ## OBJETIVO
-Atuar como Engenheiro Principal de AppSec e Especialista em Criptografia Aplicada (Yellow Team / Defesa Ativa). Sua missão é realizar uma varredura rigorosa no repositório aplicando as diretrizes do **OWASP Cheat Sheet Series** (*Secrets Management, Password Storage, Cryptographic Storage, Key Management e Credential Stuffing Prevention*).
+Atuar como Engenheiro Principal de AppSec e Especialista em Criptografia Aplicada (Yellow Team / Defesa Ativa). Sua missão é realizar uma varredura rigorosa no repositório aplicando as diretrizes do **OWASP Cheat Sheet Series** (*Secrets Management, Password Storage, Cryptographic Storage, Key Management e Credential Stuffing Prevention*) e do **OWASP WSTG v4.2** (*WSTG-SESS e WSTG-IDNT*).
 
-O foco é identificar vazamento de segredos, credenciais hardcoded, configurações inseguras de ambiente, vulnerabilidades em algoritmos de hashing de senhas, ataques de tempo (*timing attacks*), certificados expostos e histórico git comprometido.
+O foco é identificar vazamento de segredos, credenciais hardcoded, configurações inseguras de ambiente, vulnerabilidades em algoritmos de hashing de senhas, falhas de regeneração de sessão (*Session Fixation*), enumeração de contas (*Account Harvesting*), ataques de tempo (*timing attacks*), certificados expostos e histórico git comprometido.
 
 Para complementar a auditoria estática manual, você DEVE configurar um ambiente isolado em Python (`venv`), instalar e rodar a ferramenta `trufflehog3`, analisar criticamente o output para filtrar falsos positivos e mocks de testes, e consolidar todos os achados reais no relatório final.
 
@@ -40,11 +40,11 @@ Antes de iniciar a leitura detalhada do código, configure o ambiente isolado e 
    - **Mocks e Testes:** Identifique segredos em `/test`, `/spec`, `__mocks__` ou fixtures. Marque-os como *Baixa Severidade / Débito Técnico* se forem strings óbvias de teste (ex: `TEST_SECRET_123`), mas alerte caso pareçam chaves reais reaproveitadas.
    - **Hashes Públicos e UUIDs:** Ignore hashes de commit, UUIDs, IDs públicos de recursos ou strings randômicas que não representam credenciais funcionais.
    - **Chaves Reais em Produção/Config:** Destaque como **CRÍTICA** qualquer chave válida (AWS, GCP, OpenAI, Stripe, JWT Secrets, Private Keys) encontrada em código ou arquivos de configuração versionados.
-3. Leia todos os arquivos de autenticação, hashing de senhas, criptografia, carregamento de variáveis de ambiente e arquivos `.gitignore`.
+3. Leia todos os arquivos de autenticação, hashing de senhas, gerenciamento de sessões, criptografia, carregamento de variáveis de ambiente e arquivos `.gitignore`.
 
 ---
 
-## CHECKLIST DE VALIDAÇÃO PRÁTICA (OWASP SECRETS & CRYPTO STANDARDS)
+## CHECKLIST DE VALIDAÇÃO PRÁTICA (OWASP SECRETS, CRYPTO & WSTG)
 
 ### 1. Hardcoded Secrets e Chaves de API (OWASP Secrets Management)
 - [ ] **Credenciais de Provedores de Nuvem e Terceiros:** Identifique chaves de API (AWS Access Keys, GCP Service Account JSONs, Azure Connection Strings, Stripe, Twilio, SendGrid, OpenAI, etc.) inseridas diretamente no código-fonte.
@@ -52,13 +52,14 @@ Antes de iniciar a leitura detalhada do código, configure o ambiente isolado e 
 - [ ] **Segredos de Autenticação Interna e JWT:** Identifique `JWT_SECRET`, senhas de banco de dados, chaves de sessão ou segredos de webhook gravados como literais estáticos no código.
 - [ ] **Fallbacks Inseguros em Código:** Identifique padrões perigosos de fallback de configuração (ex: `const secret = process.env.API_SECRET || "minha-senha-secreta-padrao"`).
 
-### 2. Padrões de Hashing de Senhas (OWASP Password Storage Cheat Sheet)
+### 2. Padrões de Hashing de Senhas e Autenticação (OWASP Password Storage & WSTG)
 - [ ] **Conformidade de Algoritmo de Hashing:** Verifique qual algoritmo é utilizado para persistir senhas:
   - **Padrão Ouro Recomendado:** `Argon2id` (mínimo: $64\,\text{MB}$ de memória, $3$ iterações, $4$ threads de paralelismo).
   - **Alternativas Seguras:** `scrypt`, `bcrypt` (com fator de custo $\ge 12$) ou `PBKDF2` (com HMAC-SHA256 $\ge 600.000$ iterações).
   - **Vulnerabilidades Críticas (Banidos):** Uso de `MD5`, `SHA-1`, `SHA-256/512` simples/sem KDF, ou `bcrypt` com custo fraco ($< 10$).
 - [ ] **Arquitetura de Salt & Pepper:** Verifique se o hash utiliza um Salt criptograficamente seguro (CSPRNG) único por usuário e se há suporte a Pepper global gerenciado em cofre seguro (HSM / KMS) fora do banco de dados.
 - [ ] **Resistência a Timing Attacks na Autenticação:** Verifique se a comparação de hashes de senha, tokens de verificação e assinaturas HMAC utiliza funções de tempo constante (ex: `crypto.timingSafeEqual()`, `hmac.compare_digest()`, `MessageDigest.isEqual()`) para impedir ataques de temporização (*side-channel timing attacks*).
+- [ ] **Fixação de Sessão & Enumeração de Usuários (WSTG-SESS-03 / IDNT-04):** Verifique se o Session ID é regenerado obrigatoriamente após a autenticação bem-sucedida e se mensagens e tempos de resposta em login e redefinição de senha são homogêneos, impedindo enumeração de e-mails/usuários.
 
 ### 3. Gestão de Variáveis de Ambiente, .gitignore e Cofres
 - [ ] **Exposição de Arquivos .env:** Verifique se arquivos contendo segredos reais (ex: `.env`, `.env.production`, `.env.local`) estão presentes no repositório ou ausentes no arquivo `.gitignore`.
@@ -83,7 +84,7 @@ Apresente uma tabela inicial contendo TODOS os achados confirmados:
 |---|---|---|---|---|---|---|
 | #1 | `src/config/aws.ts:14` | OWASP Secrets (AWS Key) | CRÍTICA | Baixo (10 min) | **SIM** | Trufflehog3 + Validação |
 | #2 | `src/auth/hash.ts:25` | OWASP Password Storage (SHA-256) | CRÍTICA | Baixo (30 min) | **SIM** | Análise Estática |
-| #3 | `src/auth/token.ts:50` | Crypto (Timing Attack) | MÉDIA | Baixo (15 min) | **SIM** | Análise Estática |
+| #3 | `src/auth/session.ts:18` | WSTG Session Fixation | ALTA | Baixo (15 min) | **SIM** | Análise Estática |
 
 *(Quick Win: Problema de Severidade ALTA ou CRÍTICA com Esforço de Correção BAIXO).*
 
@@ -94,7 +95,7 @@ Para CADA item listado na tabela, forneça a análise completa:
 - **Esforço de Correção:** [BAIXO | MÉDIO | ALTO]
 - **Tag:** [QUICK WIN] *(se aplicável)*
 - **Arquivo/Linha:** `caminho/do/arquivo.ext:linha`
-- **Categoria:** [OWASP Secrets / Password Storage / Cryptographic Storage / Key Management / Timing Attacks]
+- **Categoria:** [OWASP Secrets / Password Storage / Cryptographic Storage / Session Fixation / Timing Attacks]
 - **Status de Triagem:** [Segredo Real / Falso Positivo Mitigado / Débito de Teste / Algoritmo Fraco]
 - **Problema & Vetor de Exploração:** Explicação direta do risco de vazamento, quebra de hash por força bruta ou exploração em produção.
 - **Evidência:** Trecho do código-fonte ou linha do segredo (mascarando dados ultra-críticos como `akid...XXXX`).
@@ -106,7 +107,7 @@ Para CADA item listado na tabela, forneça a análise completa:
 
 DEPOIS DA AUDITORIA, crie e execute um script para gerar um RELATÓRIO EM PDF, visualmente amigável, em pt-BR, salvo em `docs/secrets-audit/relatorio-auditoria-segredos.pdf`, contendo:
 
-a) **Capa:** Título "Relatório de Auditoria de Gestão de Segredos e Criptografia (OWASP Standards) — <nome do projeto>", data, escopo auditado e nota metodológica (explicando o uso combinado de análise estática e `trufflehog3`).
+a) **Capa:** Título "Relatório de Auditoria de Gestão de Segredos e Criptografia (OWASP & WSTG) — <nome do projeto>", data, escopo auditado e nota metodológica (explicando o uso combinado de análise estática e `trufflehog3`).
 b) **Resumo Executivo:** Total de achados por severidade, gráfico de rosca por severidade e gráfico de barras por categoria OWASP.
    - **Paleta oficial:** Crítica `#B91C1C`, Alta `#EA580C`, Média `#D97706`, Baixa `#2563EB`, Ponto Forte `#059669`.
 c) **Pontos Fortes** (políticas de `.gitignore`, uso de cofres, boas práticas criptográficas já adotadas) e **Pontos Fracos** (riscos centrais).

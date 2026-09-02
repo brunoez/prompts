@@ -1,9 +1,9 @@
-# PROMPT DE AUDITORIA COMPLETA: FRONTEND & SPAS, OWASP CLIENT-SIDE SECURITY, PERFORMANCE E GERAÇÃO DE RELATÓRIO PDF
+# PROMPT DE AUDITORIA COMPLETA: FRONTEND & SPAS, OWASP CLIENT-SIDE SECURITY (WSTG), PERFORMANCE E GERAÇÃO DE RELATÓRIO PDF
 
 ## OBJETIVO
-Atuar como Engenheiro Principal de Frontend e Especialista em AppSec Client-Side (Yellow Team / Browser Security Lead). Sua missão é realizar uma varredura completa no repositório aplicando as diretrizes do **OWASP Client-Side Security Cheat Sheet Series** (*DOM-based XSS Prevention, XSS Prevention, Content Security Policy, HTML5 Security, Clickjacking Defense, CSRF Prevention e Secure Cookies*).
+Atuar como Engenheiro Principal de Frontend e Especialista em AppSec Client-Side (Yellow Team / Browser Security Lead). Sua missão é realizar uma varredura completa no repositório aplicando as diretrizes do **OWASP Client-Side Security Cheat Sheet Series** e os testes de cliente do **OWASP WSTG v4.2** (*WSTG-CLNT*).
 
-A auditoria deve identificar falhas de segurança no lado do cliente (Client-Side Security), vulnerabilidades clássicas e modernas de SPAs (React, Vue, Angular, Svelte, Next.js/Nuxt), riscos de *Prototype Pollution* no navegador, comunicação insegura via `window.postMessage`, vazamento de credenciais em bundles, headers defensivos e problemas críticos de performance web (Core Web Vitals).
+A auditoria deve identificar falhas de segurança no lado do cliente (Client-Side Security), vulnerabilidades clássicas e modernas de SPAs (React, Vue, Angular, Svelte, Next.js/Nuxt), SSTI em Server-Side Rendering, segurança em WebSockets (CSWSH), riscos de *Prototype Pollution* no navegador, comunicação insegura via `window.postMessage`, vazamento de credenciais em bundles, headers defensivos e problemas críticos de performance web (Core Web Vitals).
 
 Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um relatório completo em formato PDF e templates de Issues em Markdown para o GitHub.
 
@@ -12,22 +12,24 @@ Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um 
 ## ESCOPO E OBRIGATORIEDADE DE LEITURA
 1. Mapeie a estrutura completa de diretórios do projeto e identifique a stack/framework utilizado (React, Next.js, Vue, Nuxt, Angular, SvelteKit, Vite, Webpack, etc.).
 2. Leia todos os arquivos de documentação técnica existentes (`README.md`, `/docs`, guias de contribuição).
-3. Identifique e analise TODOS os arquivos da camada de cliente: componentes, páginas/rotas, gerenciadores de estado global (Redux, Zustand, Pinia, Recoil), interceptadores HTTP (Axios, Fetch, TanStack Query), arquivos de configuração de build, headers/meta-tags HTML, manipuladores de eventos (`message`, `storage`) e utilitários de autenticação.
+3. Identifique e analise TODOS os arquivos da camada de cliente e SSR: componentes, páginas/rotas, templates de renderização no servidor, conexões de WebSocket, gerenciadores de estado global (Redux, Zustand, Pinia), interceptadores HTTP (Axios, Fetch, TanStack Query), arquivos de configuração de build, headers/meta-tags HTML, manipuladores de eventos (`message`, `storage`) e utilitários de autenticação.
 4. Você DEVE ler e analisar cada arquivo identificado linha por linha. Não faça suposições sem validar o código-fonte correspondente.
 
 ---
 
-## CHECKLIST DE VALIDAÇÃO PRÁTICA (OWASP CLIENT-SIDE SECURITY & SPAS)
+## CHECKLIST DE VALIDAÇÃO PRÁTICA (OWASP CLIENT-SIDE SECURITY & WSTG-CLNT)
 
-### 1. Injeções, DOM XSS e Sanitização Moderna (OWASP DOM-based XSS & Trusted Types)
+### 1. Injeções, DOM XSS e Sanitização Moderna (OWASP DOM-based XSS & WSTG-INPV-18)
 - [ ] **Cross-Site Scripting (DOM & Reflected XSS):** Identifique renderizações inseguras de HTML sem sanitização estrita (ex: `dangerouslySetInnerHTML`, `v-html`, `[innerHTML]`, `bypassSecurityTrustHtml`).
 - [ ] **Manipulação Direta e Sinks Inseguros do DOM:** Localize usos perigosos de `eval()`, `document.write()`, `element.insertAdjacentHTML()`, `window.location.href = userInput` ou injeção dinâmica de scripts sem validação de URL.
 - [ ] **Trusted Types API Support:** Verifique se a aplicação possui suporte a **Trusted Types** (`require-trusted-types-for 'script'` no CSP e uso de `trustedTypes.createPolicy()`), bloqueando injeção de strings brutas no DOM diretamente no motor do navegador.
+- [ ] **SSTI em Server-Side Rendering (WSTG-INPV-18):** Em aplicações com SSR (Next.js, Nuxt, SvelteKit) ou templates no servidor (EJS, Handlebars, Pug), identifique interpolação direta de entrada de usuário no corpo de templates gerando execução arbitrária de código.
 - [ ] **Client-Side Prototype Pollution:** Identifique funções recursivas de clonagem ou merge de objetos (`lodash.merge`, `Object.assign`, `deepMerge`) recebendo inputs não confiáveis do cliente ou queries que possam poluir `Object.prototype`.
 - [ ] **Open Redirect no Cliente:** Verifique se parâmetros de query string (ex: `?redirect=/dashboard` ou `?returnUrl=https://...`) são usados diretamente em roteadores/redirecionamentos sem validação de caminhos relativos ou whitelist de domínios seguros.
 
-### 2. Comunicação Entre Janelas, Clickjacking e CSRF (OWASP HTML5 & Defense)
+### 2. Comunicação Entre Janelas, WebSockets, Clickjacking e CSRF (WSTG-CLNT)
 - [ ] **Segurança de `window.postMessage`:** Verifique se os ouvintes de eventos de mensagem (`window.addEventListener('message', ...)`) validam rigorosamente a origem (`event.origin === TRUSTED_DOMAIN`) e a fonte (`event.source`) antes de processar payloads ou executar ações no estado global.
+- [ ] **WebSocket Security & CSWSH (WSTG-CLNT-10):** Verifique se conexões WebSocket no cliente validam tokens de autenticação temporários e se o handshake exige verificação estrita do cabeçalho `Origin` no servidor, mitigando Cross-Site WebSocket Hijacking.
 - [ ] **Defesa contra Clickjacking / UI Redressing:** Verifique a presença de `Content-Security-Policy: frame-ancestors 'none'` ou `'self'` (ou `X-Frame-Options: DENY`), impedindo que a aplicação seja renderizada dentro de iframes maliciosos transparentes.
 - [ ] **Prevenção CSRF e Interceptadores HTTP:** Verifique se requisições mutativas (POST/PUT/DELETE) que utilizam cookies de sessão possuem cabeçalhos anti-CSRF customizados (ex: `X-Requested-With`, `X-CSRF-Token`) ou se os cookies utilizam `SameSite=Strict/Lax`.
 - [ ] **Reverse Tabnabbing:** Verifique se todas as tags `<a target="_blank">` possuem o atributo `rel="noopener noreferrer"` para impedir manipulação da página de origem (`window.opener`).
@@ -68,10 +70,10 @@ Para CADA item listado na tabela, forneça a análise completa:
 - **Esforço de Correção:** [BAIXO | MÉDIO | ALTO]
 - **Tag:** [QUICK WIN] *(se aplicável)*
 - **Arquivo/Linha:** `caminho/do/arquivo.ext:linha`
-- **Categoria:** [DOM XSS & Trusted Types / PostMessage Security / Clickjacking & CSRF / Storage & Secrets / CSP & SRI / Performance]
-- **Vetor de Exploração:** Explicação direta de como um atacante pode injetar scripts, roubar sessões, manipular iframes ou sequestrar contas no navegador.
+- **Categoria:** [DOM XSS & Trusted Types / PostMessage & WebSockets / Clickjacking & CSRF / Storage & Secrets / CSP & SRI / Performance]
+- **Vetor de Exploração:** Explicação direta de como um atacante pode injetar scripts, roubar sessões, manipular iframes ou sequestrar conexões em tempo real.
 - **Evidência:** Trecho do código-fonte atual identificado no repositório.
-- **Correção Recomendada:** Código devidamente refatorado aplicando as melhores práticas do OWASP Client-Side Security.
+- **Correção Recomendada:** Código devidamente refatorado aplicando as melhores práticas do OWASP Client-Side Security e WSTG.
 
 ---
 
@@ -79,11 +81,11 @@ Para CADA item listado na tabela, forneça a análise completa:
 
 DEPOIS DA AUDITORIA, crie e execute um script para gerar um RELATÓRIO EM PDF, visualmente amigável, em pt-BR, salvo em `docs/frontend-audit/relatorio-auditoria-frontend.pdf`, contendo:
 
-a) **Capa:** Título "Relatório de Auditoria de Frontend e SPAs (OWASP Client-Side Standards) — <nome do projeto>", data, escopo auditado e nota metodológica.
+a) **Capa:** Título "Relatório de Auditoria de Frontend e SPAs (OWASP Client-Side & WSTG) — <nome do projeto>", data, escopo auditado e nota metodológica.
 b) **Resumo Executivo:** Total de achados por severidade, gráfico de rosca por severidade e gráfico de barras por categoria OWASP.
    - **Paleta oficial:** Crítica `#B91C1C`, Alta `#EA580C`, Média `#D97706`, Baixa `#2563EB`, Ponto Forte `#059669`.
 c) **Pontos Fortes** (o que está protegido no client-side, com evidência) e **Pontos Fracos** (os riscos centrais).
-d) **Matriz de Conformidade OWASP Client-Side:** Tabela indicando status para DOM XSS, PostMessage, CSP, Cookies e Clickjacking.
+d) **Matriz de Conformidade OWASP Client-Side & WSTG:** Tabela indicando status para DOM XSS, PostMessage, WebSockets, CSP, Cookies e Clickjacking.
 e) **Tabela de Achados Detalhados por Categoria:** Severidade | Arquivo:linha | Descrição, com indicação/chip de severidade e tag de Quick Win.
 f) **Recomendações Priorizadas** (P1, P2, P3...).
 g) **Seção Final "ISSUES PARA O GITHUB":** Para cada achado acionável, o texto COMPLETO de uma issue em Markdown, pronto para copiar e colar, dentro de um bloco delimitado (ex: entre `--- ISSUE n ---` e `--- FIM ISSUE n ---`). Cada issue deve conter:
