@@ -1,13 +1,13 @@
 # ==============================================================================
-# GitHub Actions Workflow: Auditoria de Segurança Automática com Agente de IA
+# GitHub Actions Workflow: Auditoria de Segurança com IA & Integração Jira
 # Modelo para uso em Projetos Privados de Clientes / Empresas
 # ==============================================================================
 # Este workflow executa a suíte de prompts de AppSec (OWASP ASTF 2023 / WSTG v4.2)
-# em cada Pull Request, gerando relatórios em PDF e importando vulnerabilidades
-# diretamente na aba "Security / Code Scanning" do GitHub via SARIF.
+# em cada Pull Request, gerando relatórios em PDF, publicando alertas no
+# GitHub Security via SARIF e sincronizando vulnerabilidades críticas no Jira.
 # ==============================================================================
 
-name: 🛡️ AI Security & AppSec Audit (OWASP ASTF)
+name: 🛡️ AI Security & AppSec Audit (OWASP ASTF + Jira)
 
 on:
   pull_request:
@@ -26,7 +26,7 @@ permissions:
 
 jobs:
   security-audit:
-    name: OWASP AppSec Audit
+    name: OWASP AppSec Audit & Jira Sync
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -36,7 +36,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: ⚙️ Configurar Ambiente Python para Relatórios
+      - name: ⚙️ Configurar Ambiente Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -54,7 +54,6 @@ jobs:
 
       - name: 🤖 Executar Auditoria com Agente de IA (CLI)
         env:
-          # Configure a chave de API da IA de sua preferência nos Secrets do repositório:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -67,7 +66,6 @@ jobs:
           # Exemplo 2: Execução com Antigravity / Gemini CLI
           # agy run --prompt "@[.agent/prompts/security/api.md] Realize a varredura e gere os artefatos de auditoria"
 
-          # Criação do diretório de artefatos caso não exista
           mkdir -p docs/api-audit
 
       - name: 📊 Publicar Resultados SARIF no GitHub Code Scanning
@@ -86,14 +84,27 @@ jobs:
           path: docs/api-audit/*.pdf
           retention-days: 30
 
+      - name: 📌 Sincronizar Vulnerabilidades Críticas com o Jira
+        if: always()
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}          # ex: https://minha-empresa.atlassian.net
+          JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}      # ex: devsecops@empresa.com
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}        # Token de API do Atlassian
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}    # ex: SEC ou PROJ
+          SARIF_PATH: docs/api-audit/results.sarif
+        run: |
+          # Executa o script de sincronização com o Jira (se configurado)
+          if [ -n "$JIRA_BASE_URL" ] && [ -n "$JIRA_API_TOKEN" ]; then
+            python3 .agent/prompts/examples/ci-cd/jira_sync.py || python3 examples/ci-cd/jira_sync.py
+          else
+            echo "ℹ️ Secrets do Jira não configurados. Pulando sincronização com o Jira."
+          fi
+
       - name: 💬 Comentar Resumo da Auditoria no Pull Request
         if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@v7
         with:
           script: |
-            const fs = require('fs');
-            const path = 'docs/api-audit/results.sarif';
-            
             let message = '### 🛡️ Relatório de Auditoria de Segurança com IA (OWASP ASTF)\n\n';
             message += '✅ A varredura de segurança foi executada com sucesso.\n';
             message += '📄 **Relatório em PDF:** Disponível para download nos artefatos da execução desta Action.\n';

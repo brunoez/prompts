@@ -5,6 +5,18 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/lang/pt-BR/).
 
+## [1.3.0] - 2026-09-02
+
+### Adicionado (Integração com Jira REST API v3 para CI/CD)
+- **Sincronizador Automático com Jira (`examples/ci-cd/jira_sync.py`):**
+  - Script autônomo em Python (zero dependências externas) que consome o arquivo `results.sarif` gerado pelas auditorias de IA e cria automaticamente cards/bugs no Jira para vulnerabilidades Críticas e Altas.
+  - Prevenção ativa contra duplicação de tickets via consulta prévia JQL.
+  - Formatação rica em Atlassian Document Format (ADF) contendo arquivo, linha, regra OWASP, evidência e sugestão de remediação.
+- **Workflow de GitHub Actions com Jira (`examples/ci-cd/github-actions-audit.yml`):**
+  - Atualizado para incluir o passo automatizado de criação de cards no Jira caso os secrets `JIRA_BASE_URL` e `JIRA_API_TOKEN` estejam configurados.
+- **Documentação de CI/CD para Clientes (`examples/ci-cd/README.md`):**
+  - Guia passo a passo de como gerar tokens de API no Atlassian e configurar secrets de CI/CD para automação de AppSec.
+
 ## [1.2.0] - 2026-09-02
 
 ### Adicionado & Aprimorado (Pronto para CI/CD & Modelos para Clientes)
