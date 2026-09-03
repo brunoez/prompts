@@ -42,16 +42,17 @@ Ao final da execução, você DEVE rodar os testes no terminal, garantir que tod
 
 ## FLUXO DE EXECUÇÃO DO PROMPT
 
-1. **Diagnóstico Inicial:** Liste no terminal a tabela de arquivos existentes vs arquivos de teste faltantes.
-2. **Geração dos Arquivos de Teste:** Escreva os arquivos de teste diretamente no repositório nos caminhos padronizados (ex: `src/services/auth.service.test.ts` ou `tests/integration/orders.test.ts`).
-3. **Execução e Validação:** Execute a suíte de testes no terminal do projeto:
+1. **Passo Zero — Mapeamento e Ordenação em Memória:** Antes de criar qualquer arquivo físico, mapeie internamente a hierarquia de dependências e ordene a implementação (camadas base/schemas primeiro, depois serviços de domínio, depois controllers/rotas de integração). Garanta que os comandos de teste da stack existam e sejam executáveis em uma linha.
+2. **Diagnóstico Inicial:** Liste no terminal a tabela de arquivos existentes vs arquivos de teste faltantes.
+3. **Geração dos Arquivos de Teste:** Escreva os arquivos de teste diretamente no repositório nos caminhos padronizados (ex: `src/services/auth.service.test.ts` ou `tests/integration/orders.test.ts`), aplicando testes determinísticos e evitando over-mocking.
+4. **Execução e Prova Literal (Proof of Green):** Execute a suíte de testes no terminal do projeto e apresente a saída literal:
    ```bash
    # Exemplo Node/TypeScript:
    npm test -- --run --coverage
    # Exemplo Python:
    pytest --cov=src tests/
    ```
-4. **Correção Automática:** Se algum teste falhar, analise a causa raiz, corrija o teste ou o código da aplicação e reexecute até obter 100% de sucesso.
+5. **Correção Automática e Proibição de Relaxar Asserções:** Se algum teste falhar, analise a causa raiz. Se o código de produção possuir um defeito, corrija o código de produção — nunca enfraqueça o teste nem mascare falhas com mocks artificiais para forçar aprovação. Reexecute até obter 100% de sucesso real.
 
 ---
 

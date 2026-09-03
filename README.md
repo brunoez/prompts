@@ -18,7 +18,7 @@
 
 ## 🇧🇷 Sobre o Projeto
 
-Criado com foco na comunidade brasileira de desenvolvimento e AppSec, este repositório aberto reúne **prompts técnicos de alto nível** projetados para serem executados por Engenheiros Principais ou Agentes de IA (Antigravity, Cursor, Windsurf, Claude Code, GitHub Copilot).
+Criado com foco na comunidade brasileira de desenvolvimento e AppSec, este repositório aberto reúne **prompts técnicos de alto nível** projetados para serem executados por Engenheiros Principais ou Agentes de IA (**Claude Code**, **VSCode** / GitHub Copilot, **Cursor** e outros editores como Windsurf e Antigravity).
 
 O objetivo é transformar a velocidade do **Vibe Coding** em software de **nível corporativo**: seguro contra vulnerabilidades (**OWASP ASTF 2023**, **WSTG v4.2** e **OWASP Cheat Sheet Series**), arquiteturalmente consistente (DDD/SDD), resiliente em produção (SRE) e 100% testado (TDD, BDD, SecDD).
 
@@ -32,15 +32,15 @@ Instale a suíte de prompts no seu projeto com um único comando:
 curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash
 ```
 
-> **Dica de IDE:** Por padrão, os prompts são instalados em `.agent/prompts/`. Se você usa **Cursor** ou **Windsurf**:
+> **Dica de Ferramenta & IDE:** Por padrão, os prompts são instalados em `.agent/prompts/`, prontos para uso no **Claude Code** e **VSCode**. Se você usa **Cursor** ou outros editores:
 > ```bash
-> # Para Cursor (.cursor/rules):
+> # Para Claude Code e VSCode (instalação padrão em .agent/prompts/):
+> curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash
+> 
+> # Para Cursor (.cursor/rules/):
 > curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash -s -- . cursor
 > 
-> # Para Windsurf (.windsurf/rules):
-> curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash -s -- . windsurf
-> 
-> # Para todas as ferramentas simultaneamente:
+> # Para todas as ferramentas e editores simultaneamente (.agent, .cursor, .windsurf):
 > curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash -s -- . all
 > ```
 
@@ -50,7 +50,7 @@ curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | ba
 
 ```plaintext
 seu-projeto/
-├── .agent/prompts/               # Prompts (ou .cursor/rules/)
+├── .agent/prompts/               # Prompts para Claude Code, VSCode ou .cursor/rules/
 │   ├── driven-development/       # Metodologias & Testes
 │   │   ├── bdd_behavior_driven.md     # BDD & Gherkin
 │   │   ├── cdd_contract_driven.md     # Contratos & OpenAPI
@@ -77,7 +77,7 @@ seu-projeto/
 ├── tests/                        # Testes automatizados
 ├── docs/                         # Relatórios em PDF e SARIF
 ├── CONTEXT.md                    # Dicionário do negócio
-└── CLAUDE.md / .cursorrules      # Regras de IA do projeto
+└── CLAUDE.md / .github/copilot-instructions.md / .cursorrules # Regras de IA do projeto
 ```
 
 ---
@@ -174,7 +174,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
 
 ### 🎯 2. Arquitetura, Contexto & Testes (Driven Developments)
 
-* **Para ensinar o vocabulário do seu negócio à IA e gerar `CONTEXT.md`, `CLAUDE.md` e `.cursorrules`:**
+* **Para ensinar o vocabulário do seu negócio à IA e gerar `CLAUDE.md`, `.github/copilot-instructions.md`, `.cursorrules` e `CONTEXT.md`:**
   * **Use:** [`prompts/driven-development/project_context.md`](prompts/driven-development/project_context.md)
   * **Comando:**
     ```markdown
@@ -274,7 +274,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
 
 | Prompt | Especialidade | Descrição & Escopo |
 | :--- | :--- | :--- |
-| [`project_context.md`](prompts/driven-development/project_context.md) | **Engenheiro de Contexto & Onboarding de IA** | Mapeia o vocabulário e regras do projeto e gera os arquivos de contexto para IAs: **`CONTEXT.md`** (glossário de negócio e invariantes), **`CLAUDE.md`**, **`.cursorrules`** e **`.github/copilot-instructions.md`**. |
+| [`project_context.md`](prompts/driven-development/project_context.md) | **Engenheiro de Contexto & Onboarding de IA** | Mapeia o vocabulário e regras do projeto e gera os arquivos de contexto para IAs: **`CLAUDE.md`** (Claude Code), **`.github/copilot-instructions.md`** (VSCode), **`.cursorrules`** (Cursor) e **`CONTEXT.md`** (glossário universal). |
 | [`technical_documentation.md`](prompts/driven-development/technical_documentation.md) | **Arquiteto de Software (Docs-as-Code)** | Mapeia e gera a documentação técnica completa: **Stack & Versões, Diagramas C4 Model, Diagrama ERD do Banco de Dados, Catálogo de Endpoints/Entrypoints, Mensageria, Guia de Onboarding/Setup Local e Deploy/Observabilidade**. |
 | [`test_suite_generator.md`](prompts/driven-development/test_suite_generator.md) | **Engenheiro de QA & Test Automation** | Varre a aplicação, identifica código sem testes e **gera, implementa e executa fisicamente** a Pirâmide de Testes completa (Unitários, Integração com Supertest/Testcontainers, E2E com Playwright e carga com K6). |
 | [`sdd_spec_driven.md`](prompts/driven-development/sdd_spec_driven.md) | **Spec & Schema-Driven** | Especificação técnica formal prévia (SDD/RFC), Schemas Zod/TypeBox como fonte única da verdade, inferência estrita de tipos e prevenção de *Spec Drift*. |
@@ -314,10 +314,11 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
 
 Todos os prompts são padronizados para entregar:
 1. **Matriz de Priorização no Terminal:** Tabela com ordenação por Severidade x Esforço e chips de **Quick Wins**.
-2. **Detalhamento Completo dos Achados:** Arquivo/linha, evidência, impacto real e código corrigido pronto.
-3. **Relatório em PDF com Gráficos:** Salvo na pasta `docs/<modulo>-audit/`, com design profissional (paleta `#B91C1C` Crítica, `#EA580C` Alta, `#D97706` Média, `#2563EB` Baixa, `#059669` Pontos Fortes).
-4. **Exportação SARIF (quando aplicável):** Arquivos compatíveis com o GitHub Code Scanning / Advanced Security.
-5. **Issues Formatadas para GitHub/GitLab:** Blocos em Markdown prontos para copiar com critérios de aceite verificáveis.
+2. **Detalhamento Completo dos Achados com PoC & Verificação:** Arquivo/linha, evidência factual, Prova de Conceito (PoC de reprodução), código seguro pronto e comando de verificação pós-correção.
+3. **Filtro Anti-Fadiga e Anti-Alucinação:** Foco exclusivo no raio de impacto real (*Blast Radius*), descartando falso-positivo teórico e separando sugestões cosméticas (*nits*).
+4. **Relatório em PDF com Gráficos:** Salvo na pasta `docs/<modulo>-audit/`, com design profissional (paleta `#B91C1C` Crítica, `#EA580C` Alta, `#D97706` Média, `#2563EB` Baixa, `#059669` Pontos Fortes).
+5. **Exportação SARIF (quando aplicável):** Arquivos compatíveis com o GitHub Code Scanning / Advanced Security.
+6. **Issues Formatadas para GitHub/GitLab:** Blocos em Markdown prontos para copiar com critérios de aceite verificáveis.
 
 ---
 

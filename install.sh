@@ -26,7 +26,7 @@ echo "================================================================="
 echo -e "${C_RESET}"
 
 TARGET_DIR="${1:-.}"
-INSTALL_MODE="${2:-agent}" # opcoes: agent (padrao), cursor, windsurf, submodule, all
+INSTALL_MODE="${2:-claude}" # opcoes: claude (padrao), vscode, cursor, all, submodule (ou windsurf)
 
 echo -e "${C_BLUE}ℹ️  Diretório alvo: ${C_BOLD}${TARGET_DIR}${C_RESET}"
 
@@ -97,6 +97,12 @@ case "$INSTALL_MODE" in
   submodule)
     install_submodule
     ;;
+  claude|claude-code)
+    install_files "${TARGET_DIR}/.agent/prompts"
+    ;;
+  vscode)
+    install_files "${TARGET_DIR}/.agent/prompts"
+    ;;
   cursor)
     install_files "${TARGET_DIR}/.cursor/rules"
     ;;
@@ -115,8 +121,9 @@ esac
 
 echo ""
 echo -e "${C_GREEN}${C_BOLD}🎉 Instalação concluída com sucesso!${C_RESET}"
-echo -e "${C_CYAN}👉 Para usar em sua IDE ou agente de IA:${C_RESET}"
-echo -e "   1. Mencione o arquivo no chat (ex: @[.agent/prompts/sdd_spec_driven.md])"
-echo -e "   2. Solicite a auditoria ou o planejamento guiado para sua feature."
-echo -e "   3. Documentação completa em: ${C_BOLD}https://github.com/brunoez/prompts${C_RESET}"
+echo -e "${C_CYAN}👉 Como usar no seu ambiente:${C_RESET}"
+echo -e "   1. No Claude Code: use no terminal ou chat (ex: @[.agent/prompts/security/api.md])"
+echo -e "   2. No VSCode: use no Copilot Chat (ex: @workspace @[.agent/prompts/driven-development/sdd_spec_driven.md])"
+echo -e "   3. No Cursor: use as regras em @[.cursor/rules/...]"
+echo -e "   4. Documentação completa em: ${C_BOLD}https://github.com/brunoez/prompts${C_RESET}"
 echo ""

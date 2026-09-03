@@ -5,6 +5,24 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/lang/pt-BR/).
 
+## [1.6.0] - 2026-09-03
+
+### Aprimorado (Alinhamento com AI-Native Playbook & Priorização de IDEs)
+- **Priorização de Ferramentas (Claude Code ➔ VSCode ➔ Cursor):**
+  - Reestruturação de documentação, `README.md`, `project_context.md` e `install.sh` definindo **Claude Code** como ferramenta principal, seguido de **VSCode** e **Cursor**.
+  - Menções isoladas ao Windsurf unificadas junto aos outros editores suportados.
+  - Atualizado `install.sh` com o modo padrão `claude` (`.agent/prompts/`) e opções dedicadas para `vscode`, `cursor` e `all`.
+- **Diretriz Anti-Fadiga e Anti-Alucinação (Filtro Factual):**
+  - Inserida cláusula estrita em prompts de auditoria (`api.md`, `db.md`) proibindo achados hipotéticos sem evidência factual e separando recomendações cosméticas (`[NIT]`).
+- **Prova de Conceito (PoC) & Comando de Verificação nos Achados:**
+  - Cada achado de segurança agora inclui obrigatoriamente um comando de reprodução (`curl`, script, query) e um comando de verificação para validar a correção em 1 linha.
+- **Regra Inviolável do Teste Travado (*Failing-Test-First*):**
+  - Inserida em `tdd_test_driven.md` e `test_suite_generator.md` regra que proíbe expressamente que a IA enfraqueça asserções ou ignore testes para fazê-los passar; a correção deve ser 100% no código de produção.
+- **Mapeamento em Memória (Passo Zero):**
+  - Adicionada orientação de ordenação mental de dependências antes da escrita física de testes ou código.
+- **Modernização do `CLAUDE.md` em `project_context.md`:**
+  - Modelo atualizado com diretrizes modernas da Anthropic: regra de sub-1-página, bloco "Como Verificar seu Trabalho (Proof of Done)" com saídas literais esperadas e bloco "Erros Recorrentes (Regra do Erro Repetido)".
+
 ## [1.5.0] - 2026-09-02
 
 ### Adicionado (Suíte de Testes Unitários com Mocks para Sincronizadores)

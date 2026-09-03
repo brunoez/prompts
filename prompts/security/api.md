@@ -14,6 +14,7 @@ Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um 
 2. **Auditoria de Contrato e Inventário:** Leia arquivos de especificação (`openapi.yaml`, `swagger.json`, schemas `.graphql`, arquivos `.proto`, `postman_collection.json`). Compare as rotas declaradas com as rotas reais implementadas nos controllers para identificar **Shadow/Zombie APIs (ASTF-API9)**.
 3. Identifique e analise TODOS os arquivos da camada de interface e rotas: controllers, handlers, resolvers GraphQL, serviços gRPC, handlers de WebSocket, middlewares de autenticação/autorização, DTOs/schemas de validação (Zod, Joi, Pydantic, class-validator), manipuladores de upload/arquivos, interceptores e clientes HTTP/Webhooks downstream.
 4. Você DEVE ler e analisar cada arquivo identificado linha por linha. Não faça suposições sem validar o código-fonte correspondente.
+5. **Diretriz Anti-Fadiga e Anti-Alucinação (Filtro Factual):** Só reporte vulnerabilidades que possam ser categoricamente comprovadas pelo código-fonte inspecionado. É proibido levantar suposições hipotéticas sem evidência no repositório. Recomendações puramente cosméticas ou de estilo sem impacto real de segurança devem ser marcadas como `[NIT]` ou descartadas, mantendo o foco estrito no risco real e no raio de impacto (*Blast Radius*).
 
 ---
 
@@ -73,7 +74,9 @@ Para CADA item da tabela:
 - **Arquivo/Linha:** `caminho/do/arquivo.ext:linha`
 - **Vetor de Ataque / Exploração:** Como um atacante explora essa falha (ex: payload de exemplo, bypass de extensão, chamada com segundo token ou WebSocket hijacking).
 - **Evidência:** Trecho do código-fonte vulnerável.
+- **Prova de Conceito (PoC / Reprodução):** Exemplo de requisição reproduzível (`curl`, script ou payload HTTP) para demonstrar a falha no contexto do projeto.
 - **Correção Recomendada:** Código devidamente refatorado e seguro.
+- **Comando de Verificação da Correção:** Como o desenvolvedor valida em 1 comando (teste automatizado ou chamada de verificação) que a correção funcionou sem quebrar o contrato da API.
 
 ---
 

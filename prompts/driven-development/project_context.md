@@ -1,9 +1,9 @@
-# PROMPT DE CONFIGURAÇÃO DE CONTEXTO, DICIONÁRIO DO PROJETO E REGRAS PARA IAs (CONTEXT.md, CLAUDE.md, CURSOR, COPILOT)
+# PROMPT DE CONFIGURAÇÃO DE CONTEXTO, DICIONÁRIO DO PROJETO E REGRAS PARA IAs (CLAUDE CODE, VSCODE, CURSOR, CONTEXT.md)
 
 ## OBJETIVO
-Atuar como Engenheiro Principal de Contexto e Arquitetura de Software. Sua missão é realizar uma varredura completa no repositório para mapear o vocabulário do negócio, os termos técnicos e os padrões de desenvolvimento, gerando de forma automatizada os **arquivos de contexto e diretrizes para IAs e Agentes de Código** (**`CONTEXT.md`**, **`CLAUDE.md`**, **`.cursorrules`**, **`.github/copilot-instructions.md`** e **`.agent/rules/`**).
+Atuar como Engenheiro Principal de Contexto e Arquitetura de Software. Sua missão é realizar uma varredura completa no repositório para mapear o vocabulário do negócio, os termos técnicos e os padrões de desenvolvimento, gerando de forma automatizada os **arquivos de contexto e diretrizes para IAs e Agentes de Código** (**`CLAUDE.md`** [Claude Code], **`.github/copilot-instructions.md`** [VSCode], **`.cursorrules`** [Cursor], **`CONTEXT.md`** e **`.agent/rules/`**).
 
-O objetivo principal é eliminar a prolixidade da IA, evitar alucinações de termos inexistentes e garantir que qualquer modelo (Claude, GPT, Gemini, Cursor, Copilot) entenda perfeitamente o jargão da empresa, os comandos de execução e as regras de arquitetura do projeto.
+O objetivo principal é eliminar a prolixidade da IA, evitar alucinações de termos inexistentes e garantir que qualquer modelo ou agente (Claude Code, VSCode / GitHub Copilot, Cursor e outros editores) entenda perfeitamente o jargão da empresa, os comandos de execução e as regras de arquitetura do projeto.
 
 ---
 
@@ -18,28 +18,30 @@ O objetivo principal é eliminar a prolixidade da IA, evitar alucinações de te
 
 O prompt deve criar ou atualizar os seguintes arquivos conforme as ferramentas utilizadas no projeto:
 
-### 1. 📖 `CONTEXT.md` (Dicionário de Negócio e Glossário do Projeto)
-Arquivo universal lido por qualquer IA para entender o vocabulário da aplicação. Deve conter:
-* **Glossário do Negócio:** Termos específicos do sistema explicados em 1 ou 2 frases (ex: *"Materialization Cascade: processo de persistência em lote de módulos no disco"*).
-* **Entidades Centrais:** O que cada entidade representa e como se relacionam.
-* **Invariantes do Sistema:** Regras de negócio que NUNCA podem ser violadas (ex: *"Um pedido nunca pode ser cancelado se o status for ENVIADO"*).
-* **Dicionário De-Para:** Como a IA deve se referir aos conceitos (eliminando termos genéricos e prolixos).
+### 1. 🤖 `CLAUDE.md` (Diretrizes Principais para Claude Code / Antigravity)
+Arquivo de instruções específico lido na raiz do projeto a cada sessão (deve ter no máximo 1 página para não consumir contexto desnecessário):
+* **Comandos Principais:** Como rodar build, testes e linters com comandos únicos e rápidos.
+* **Convenções & Arquitetura:** Stack exata, padrões de validação e restrições inegociáveis.
+* **Como Verificar seu Trabalho (Proof of Done):** Instruções de verificação com saídas esperadas e a proibição de alterar testes.
+* **Erros Recorrentes (Regra do Erro Repetido):** Seção viva onde o time registra erros que a IA cometeu duas vezes para nunca mais repetir.
 
-### 2. 🤖 `CLAUDE.md` (Diretrizes para o Claude Code / Anthropic)
-Arquivo de instruções específico para o Claude Code na raiz do projeto contendo:
-* **Comandos Principais:** Como rodar testes, linters, builds e servidor local com comandos únicos e diretos.
-* **Estilo de Código:** Regras de formatação, tipagem estrita e padrões de imports.
-* **Estrutura de Pastas:** Mapa mental simplificado das camadas do projeto.
+### 2. 🐙 `.github/copilot-instructions.md` (Diretrizes para VSCode & GitHub Copilot)
+Instruções de contexto para o VSCode e Copilot Chat:
+* Linguagem e convenções do repositório.
+* Padrão de commits (Conventional Commits).
+* Instruções arquiteturais e diretrizes de estilo de código.
 
 ### 3. 🎯 `.cursorrules` ou `.cursor/rules/` (Diretrizes para o Cursor)
 Regras concisas para orientar o preenchimento automático e geração de código no Cursor:
 * Preferência de bibliotecas (ex: *"Sempre use Zod para validação e Tailwind para estilos"*).
 * Padrões proibidos (ex: *"Nunca use `any` ou `console.log` em produção"*).
 
-### 4. 🐙 `.github/copilot-instructions.md` (Diretrizes para o GitHub Copilot)
-Instruções de contexto para o Copilot Workspace e chat do GitHub:
-* Linguagem e convenções do repositório.
-* Padrão de commits (Conventional Commits).
+### 4. 📖 `CONTEXT.md` (Dicionário de Negócio e Glossário Universal)
+Arquivo universal lido por qualquer IA ou editor para entender o vocabulário da aplicação. Deve conter:
+* **Glossário do Negócio:** Termos específicos do sistema explicados em 1 ou 2 frases (ex: *"Materialization Cascade: processo de persistência em lote de módulos no disco"*).
+* **Entidades Centrais:** O que cada entidade representa e como se relacionam.
+* **Invariantes do Sistema:** Regras de negócio que NUNCA podem ser violadas (ex: *"Um pedido nunca pode ser cancelado se o status for ENVIADO"*).
+* **Dicionário De-Para:** Como a IA deve se referir aos conceitos (eliminando termos genéricos e prolixos).
 
 ---
 
@@ -77,20 +79,31 @@ Use sempre estes termos exatos ao invés de descrições genéricas:
 ## ESTRUTURA MODELO DO `CLAUDE.md`
 
 ```markdown
-# Diretrizes para o Claude Code — [Nome do Projeto]
+# Diretrizes para o Agente — [Nome do Projeto]
 
 ## Comandos do Projeto
-- **Rodar Local:** `npm run dev`
-- **Rodar Testes:** `npm test`
-- **Rodar Teste Único:** `npx vitest run src/path/to/test.ts`
+- **Build:** `npm run build` (deve terminar com "Build succeeded")
+- **Testes:** `npm test` (todos verdes; nunca pule ou delete testes)
+- **Teste Único:** `npx vitest run src/path/to/test.ts`
 - **Verificar Tipos:** `npx tsc --noEmit`
-- **Linters:** `npm run lint`
+- **Linters:** `npm run lint` (zero erros antes de concluir)
 
-## Padrões de Código
+## Convenções & Arquitetura
 - Utilize TypeScript com modo estrito (`strict: true`).
-- Toda validação de entrada deve usar **Zod**.
+- Toda validação de entrada na borda deve usar **Zod** com `.strict()`.
 - Trate erros usando classes de domínio personalizadas (`DomainError`), nunca lance strings puras.
 - Siga a linguagem e termos documentados em `CONTEXT.md`.
+- Separação clara de camadas: `api/` (controllers), `domain/` (regras puras), `infra/` (integrações externas).
+
+## Como Verificar seu Trabalho (Proof of Done)
+- Antes de reportar qualquer tarefa pronta, execute o build, testes e linter.
+- Cole a saída literal comprovando que todos os checks passaram com sucesso.
+- Se um teste falhar durante a correção de um bug, corrija o código de produção, NUNCA altere o teste.
+
+## Erros Recorrentes (Regra do Erro Repetido)
+- [Quando a IA cometer um erro pela segunda vez neste projeto, registre a regra aqui]
+- Exemplo: Nunca edite arquivos gerados em `src/generated/`; altere o schema fonte e regere.
+- Exemplo: Valores monetários sempre em centavos inteiros (`integer`), nunca `float`.
 ```
 
 ---

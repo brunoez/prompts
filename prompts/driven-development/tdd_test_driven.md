@@ -12,6 +12,7 @@ Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um 
 2. Identifique os relatórios de cobertura de código existentes (`coverage/`, `lcov.info`, cobertura de branches e statements).
 3. Identifique e analise a estratégia de dublês de teste (Mocks, Stubs, Spies, Fakes, In-Memory DBs).
 4. Você DEVE ler e analisar cada arquivo de teste e função crítica, verificando se os testes validam o comportamento real da unidade ou apenas "enganam" a métrica de cobertura.
+5. **Regra Inviolável do Bugfix (Failing-Test-First & Teste Travado):** Para cada bug reportado ou nova regra: (1) Escreva primeiro o teste de regressão que reproduz o problema e execute-o comprovando que ele falha (RED); (2) O teste está formalmente travado — é estritamente proibido alterar o arquivo de teste, enfraquecer asserções (`expect`), pular (`it.skip`) ou injetar mocks vazios para fazê-lo passar; (3) A correção deve ser implementada exclusivamente no código de produção até que a suíte passe integralmente (GREEN).
 
 ---
 
@@ -63,6 +64,7 @@ Para CADA item listado na tabela, forneça a análise completa:
 - **Problema:** Explicação direta da fragilidade do teste e o risco de falha em produção.
 - **Evidência:** Código do teste atual ou função não coberta.
 - **Código do Teste TDD Recomendado:** Implementação completa do teste unitário/integração.
+- **Comando de Verificação (Proof of Green):** Comando literal (`npm test ...` ou `pytest ...`) para executar exclusivamente este teste, garantindo que ele execute de forma determinística e com 100% de sucesso.
 
 ---
 

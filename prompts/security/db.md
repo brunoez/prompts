@@ -12,6 +12,7 @@ Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um 
 2. Leia todos os arquivos de documentação e arquitetura existentes (`README.md`, `/docs`, SDD, diagramas ERD, scripts de migração).
 3. Identifique e analise TODOS os arquivos com impacto em dados: entidades, ORMs, repositórios, SQLs nativos, procedures/triggers, scripts de migração, configurações de pool e conexão (`DATABASE_URL`), controllers/mappers que tratam requisições/respostas do banco e arquivos de log/exceção.
 4. Você DEVE ler e analisar cada arquivo identificado linha por linha. Não faça suposições sem validar o código-fonte correspondente.
+5. **Diretriz Anti-Fadiga e Anti-Alucinação (Filtro Factual):** Só reporte vulnerabilidades que possam ser categoricamente comprovadas pelo código-fonte ou configurações inspecionadas. É proibido levantar suposições hipotéticas sem evidência no repositório. Recomendações puramente cosméticas ou de estilo sem impacto real de segurança devem ser marcadas como `[NIT]` ou descartadas, mantendo o foco estrito no risco real e no raio de impacto (*Blast Radius*).
 
 ---
 
@@ -70,7 +71,9 @@ Para CADA item listado na tabela, forneça a análise completa:
 - **Categoria:** [OWASP SQLi / NoSQL Injection / Database Access Control / Cryptographic Storage / Concorrência & Locks / Performance & N+1]
 - **Vetor de Exploração / Risco:** Explicação direta de como essa vulnerabilidade pode ser explorada ou causar indisponibilidade/vazamento em produção.
 - **Evidência:** Trecho do código-fonte atual identificado no repositório.
+- **Prova de Conceito (PoC / Reprodução):** Query, script ou payload reproduzível demonstrando a injeção, falha de lock/concorrência ou violação de menor privilégio.
 - **Correção Recomendada:** Código devidamente refatorado aplicando as melhores práticas do OWASP Database Security.
+- **Comando de Verificação da Correção:** Como o desenvolvedor valida em 1 comando (teste automatizado ou query segura) que a correção funcionou sem quebrar as operações do banco.
 
 ---
 
