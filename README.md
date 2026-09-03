@@ -32,15 +32,18 @@ Instale a suíte de prompts no seu projeto com um único comando:
 curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash
 ```
 
-> **Dica de Ferramenta & IDE:** Por padrão, os prompts são instalados em `.agent/prompts/`, prontos para uso no **Claude Code** e **VSCode**. Se você usa **Cursor** ou outros editores:
+> **Dica de Ferramenta & IDE:** Por padrão, os prompts são instalados no diretório oficial do **Claude Code** (`.claude/prompts/`). Se você usa **VSCode**, **Cursor** ou outros editores:
 > ```bash
-> # Para Claude Code e VSCode (instalação padrão em .agent/prompts/):
+> # Para Claude Code (padrão oficial em .claude/prompts/):
 > curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash
+> 
+> # Para VSCode (.agent/prompts/):
+> curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash -s -- . vscode
 > 
 > # Para Cursor (.cursor/rules/):
 > curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash -s -- . cursor
 > 
-> # Para todas as ferramentas e editores simultaneamente (.agent, .cursor, .windsurf):
+> # Para todas as ferramentas simultaneamente (.claude, .agent, .cursor, .windsurf):
 > curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | bash -s -- . all
 > ```
 
@@ -50,7 +53,7 @@ curl -sSL https://raw.githubusercontent.com/brunoez/prompts/main/install.sh | ba
 
 ```plaintext
 seu-projeto/
-├── .agent/prompts/               # Prompts para Claude Code, VSCode ou .cursor/rules/
+├── .claude/prompts/              # Prompts oficiais para Claude Code (ou .agent/prompts/)
 │   ├── driven-development/       # Metodologias & Testes
 │   │   ├── bdd_behavior_driven.md     # BDD & Gherkin
 │   │   ├── cdd_contract_driven.md     # Contratos & OpenAPI
@@ -110,7 +113,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/security/api.md`](prompts/security/api.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/api.md]
+    @[.claude/prompts/security/api.md]
     Execute a auditoria de APIs neste repositório e gere o relatório em PDF e SARIF.
     ```
 
@@ -118,7 +121,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/security/business.md`](prompts/security/business.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/business.md]
+    @[.claude/prompts/security/business.md]
     Audite as regras de negócio contra fraudes, race conditions (TOCTOU) e falta de idempotência.
     ```
 
@@ -126,7 +129,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/security/secrets.md`](prompts/security/secrets.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/secrets.md]
+    @[.claude/prompts/security/secrets.md]
     Configure o venv, execute o TruffleHog3 e faça a triagem de segredos e hashing.
     ```
 
@@ -134,7 +137,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/security/frontend.md`](prompts/security/frontend.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/frontend.md]
+    @[.claude/prompts/security/frontend.md]
     Audite os componentes frontend contra DOM XSS, vazamento de tokens e CWV.
     ```
 
@@ -142,7 +145,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/security/db.md`](prompts/security/db.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/db.md]
+    @[.claude/prompts/security/db.md]
     Audite as queries, conexões e migrações contra SQLi, permissões de superuser e deadlocks.
     ```
 
@@ -150,7 +153,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/security/supply_chain.md`](prompts/security/supply_chain.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/supply_chain.md]
+    @[.claude/prompts/security/supply_chain.md]
     Audite as dependências contra pacotes alucinados, gere o SBOM e verifique CVEs.
     ```
 
@@ -158,7 +161,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/security/threat_modeling.md`](prompts/security/threat_modeling.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/threat_modeling.md]
+    @[.claude/prompts/security/threat_modeling.md]
     Faça a modelagem de ameaças STRIDE e DFD para a arquitetura desta aplicação.
     ```
 
@@ -166,7 +169,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/security/ai_appsec.md`](prompts/security/ai_appsec.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/security/ai_appsec.md]
+    @[.claude/prompts/security/ai_appsec.md]
     Audite as integrações de IA contra Prompt Injection e Insecure Output.
     ```
 
@@ -178,7 +181,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/driven-development/project_context.md`](prompts/driven-development/project_context.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/project_context.md]
+    @[.claude/prompts/driven-development/project_context.md]
     Crie o CONTEXT.md com o dicionário do projeto e os arquivos de regras de IA.
     ```
 
@@ -186,7 +189,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/driven-development/technical_documentation.md`](prompts/driven-development/technical_documentation.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/technical_documentation.md]
+    @[.claude/prompts/driven-development/technical_documentation.md]
     Mapeie o projeto e gere o docs/architecture/ARCHITECTURE.md completo.
     ```
 
@@ -194,7 +197,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/driven-development/test_suite_generator.md`](prompts/driven-development/test_suite_generator.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/test_suite_generator.md]
+    @[.claude/prompts/driven-development/test_suite_generator.md]
     Crie os testes que faltam neste projeto e execute até ficarem 100% verdes.
     ```
 
@@ -202,7 +205,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/driven-development/sdd_spec_driven.md`](prompts/driven-development/sdd_spec_driven.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/sdd_spec_driven.md]
+    @[.claude/prompts/driven-development/sdd_spec_driven.md]
     Crie o Software Design Document e os Schemas Zod para a nova feature.
     ```
 
@@ -210,7 +213,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/driven-development/secdd_abuse_cases.md`](prompts/driven-development/secdd_abuse_cases.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/secdd_abuse_cases.md]
+    @[.claude/prompts/driven-development/secdd_abuse_cases.md]
     Escreva testes de abuso simulando invasões e concorrência maliciosa.
     ```
 
@@ -218,7 +221,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/driven-development/bdd_behavior_driven.md`](prompts/driven-development/bdd_behavior_driven.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/bdd_behavior_driven.md]
+    @[.claude/prompts/driven-development/bdd_behavior_driven.md]
     Modele os fluxos de negócio em arquivos .feature com sintaxe Gherkin.
     ```
 
@@ -226,7 +229,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/driven-development/tdd_test_driven.md`](prompts/driven-development/tdd_test_driven.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/tdd_test_driven.md]
+    @[.claude/prompts/driven-development/tdd_test_driven.md]
     Aplique TDD para criar os testes unitários antes de codificar a lógica.
     ```
 
@@ -234,7 +237,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/driven-development/cdd_contract_driven.md`](prompts/driven-development/cdd_contract_driven.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/driven-development/cdd_contract_driven.md]
+    @[.claude/prompts/driven-development/cdd_contract_driven.md]
     Valide as rotas com a spec OpenAPI e configure testes de contrato Pact.
     ```
 
@@ -246,7 +249,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/devops/cicd_pipeline.md`](prompts/devops/cicd_pipeline.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/devops/cicd_pipeline.md]
+    @[.claude/prompts/devops/cicd_pipeline.md]
     Audite os workflows contra script injection, configure OIDC e pinning SHA256.
     ```
 
@@ -254,7 +257,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/devops/iac_docker_k8s.md`](prompts/devops/iac_docker_k8s.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/devops/iac_docker_k8s.md]
+    @[.claude/prompts/devops/iac_docker_k8s.md]
     Audite Dockerfiles e K8s garantindo securityContext restrito e limites.
     ```
 
@@ -262,7 +265,7 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
   * **Use:** [`prompts/devops/resilience_observability.md`](prompts/devops/resilience_observability.md)
   * **Comando:**
     ```markdown
-    @[.agent/prompts/devops/resilience_observability.md]
+    @[.claude/prompts/devops/resilience_observability.md]
     Audite os workers de fila, configure retry com DLQ e graceful shutdown.
     ```
 

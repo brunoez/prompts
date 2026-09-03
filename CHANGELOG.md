@@ -11,7 +11,7 @@ e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/l
 - **Priorização de Ferramentas (Claude Code ➔ VSCode ➔ Cursor):**
   - Reestruturação de documentação, `README.md`, `project_context.md` e `install.sh` definindo **Claude Code** como ferramenta principal, seguido de **VSCode** e **Cursor**.
   - Menções isoladas ao Windsurf unificadas junto aos outros editores suportados.
-  - Atualizado `install.sh` com o modo padrão `claude` (`.agent/prompts/`) e opções dedicadas para `vscode`, `cursor` e `all`.
+  - Atualizado `install.sh` com o modo padrão `claude` apontando para o diretório nativo oficial `.claude/prompts/` e opções dedicadas para `vscode` (`.agent/prompts/`), `cursor` (`.cursor/rules/`) e `all`.
 - **Diretriz Anti-Fadiga e Anti-Alucinação (Filtro Factual):**
   - Inserida cláusula estrita em prompts de auditoria (`api.md`, `db.md`) proibindo achados hipotéticos sem evidência factual e separando recomendações cosméticas (`[NIT]`).
 - **Prova de Conceito (PoC) & Comando de Verificação nos Achados:**

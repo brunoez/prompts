@@ -126,7 +126,7 @@ def test_installer_execution():
             print(f"❌ ERRO na execução do install.sh: {res.stderr}")
             return False
         
-        for folder in [".agent/prompts", ".cursor/rules", ".windsurf/rules"]:
+        for folder in [".claude/prompts", ".agent/prompts", ".cursor/rules", ".windsurf/rules"]:
             target_path = Path(tmpdir) / folder
             for prompt in EXPECTED_PROMPTS:
                 if not (target_path / prompt).is_file():

@@ -98,7 +98,7 @@ case "$INSTALL_MODE" in
     install_submodule
     ;;
   claude|claude-code)
-    install_files "${TARGET_DIR}/.agent/prompts"
+    install_files "${TARGET_DIR}/.claude/prompts"
     ;;
   vscode)
     install_files "${TARGET_DIR}/.agent/prompts"
@@ -110,6 +110,7 @@ case "$INSTALL_MODE" in
     install_files "${TARGET_DIR}/.windsurf/rules"
     ;;
   all)
+    install_files "${TARGET_DIR}/.claude/prompts"
     install_files "${TARGET_DIR}/.agent/prompts"
     install_files "${TARGET_DIR}/.cursor/rules"
     install_files "${TARGET_DIR}/.windsurf/rules"
@@ -122,7 +123,7 @@ esac
 echo ""
 echo -e "${C_GREEN}${C_BOLD}🎉 Instalação concluída com sucesso!${C_RESET}"
 echo -e "${C_CYAN}👉 Como usar no seu ambiente:${C_RESET}"
-echo -e "   1. No Claude Code: use no terminal ou chat (ex: @[.agent/prompts/security/api.md])"
+echo -e "   1. No Claude Code: use no terminal ou chat (ex: @[.claude/prompts/security/api.md])"
 echo -e "   2. No VSCode: use no Copilot Chat (ex: @workspace @[.agent/prompts/driven-development/sdd_spec_driven.md])"
 echo -e "   3. No Cursor: use as regras em @[.cursor/rules/...]"
 echo -e "   4. Documentação completa em: ${C_BOLD}https://github.com/brunoez/prompts${C_RESET}"
