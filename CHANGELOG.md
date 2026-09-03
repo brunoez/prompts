@@ -5,13 +5,30 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/lang/pt-BR/).
 
+## [1.7.0] - 2026-09-03
+
+### Adicionado & Aprimorado (Suporte Nativo ao Claude Code & Multi-IDE Sync)
+- **Suporte Oficial a `.claude/prompts/` (Padrão Nativo Anthropic):**
+  - O instalador `install.sh` agora adota `.claude/prompts/` como diretório oficial padrão para o Claude Code.
+  - O comando rápido `curl -sSL ... | bash` instala diretamente na árvore nativa `.claude/`.
+- **Matriz de Instalação Modular por IDE (`install.sh`):**
+  - Modo `claude` (padrão oficial): `.claude/prompts/`
+  - Modo `vscode` / `agent`: `.agent/prompts/`
+  - Modo `cursor`: `.cursor/rules/`
+  - Modo `windsurf`: `.windsurf/rules/`
+  - Modo `all`: sincronização simultânea nas 4 árvores de diretórios (`.claude`, `.agent`, `.cursor`, `.windsurf`).
+- **Documentação e Exemplos de Invocação (`README.md`):**
+  - Atualização dos 19 comandos de invocação rápida para a sintaxe nativa `@[.claude/prompts/...]`.
+  - Instruções de uso claras diferenciando Claude Code, VSCode e Cursor.
+- **Validação Automatizada de Multi-IDE (`tests/test_integrity.py`):**
+  - Expansão do teste `test_installer_execution` para validar a presença física dos 19 prompts nas 4 pastas suportadas.
+
 ## [1.6.0] - 2026-09-03
 
-### Aprimorado (Alinhamento com AI-Native Playbook & Priorização de IDEs)
+### Aprimorado (Alinhamento com AI-Native Playbook & Priorização de Ferramentas)
 - **Priorização de Ferramentas (Claude Code ➔ VSCode ➔ Cursor):**
   - Reestruturação de documentação, `README.md`, `project_context.md` e `install.sh` definindo **Claude Code** como ferramenta principal, seguido de **VSCode** e **Cursor**.
   - Menções isoladas ao Windsurf unificadas junto aos outros editores suportados.
-  - Atualizado `install.sh` com o modo padrão `claude` apontando para o diretório nativo oficial `.claude/prompts/` e opções dedicadas para `vscode` (`.agent/prompts/`), `cursor` (`.cursor/rules/`) e `all`.
 - **Diretriz Anti-Fadiga e Anti-Alucinação (Filtro Factual):**
   - Inserida cláusula estrita em prompts de auditoria (`api.md`, `db.md`) proibindo achados hipotéticos sem evidência factual e separando recomendações cosméticas (`[NIT]`).
 - **Prova de Conceito (PoC) & Comando de Verificação nos Achados:**
