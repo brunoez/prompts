@@ -1,7 +1,7 @@
 # PROMPT DE AUDITORIA COMPLETA: RESILIÊNCIA, OBSERVABILIDADE, MENSAGERIA & ESTABILIDADE (SRE & YELLOW TEAM)
 
 ## OBJETIVO
-Atuar como Engenheiro Principal de Confiabilidade (SRE) e Especialista em Arquitetura Resiliente (Yellow Team). Sua missão é auditar o repositório para garantir **alta disponibilidade, resiliência contra falhas em cascata, observabilidade ponta a ponta (Logs Estruturados, Métricas e Tracing Distribuído com OpenTelemetry)** e integridade no processamento assíncrono (**Filas, Mensageria, Dead Letter Queues e Backpressure**).
+Atuar como Engenheiro Principal de Confiabilidade (SRE) e Especialista em Arquitetura Resiliente (Yellow Team). Sua missão é auditar o repositório para garantir **alta disponibilidade, resiliência contra falhas em cascata, observabilidade ponta a ponta (Logs Estruturados, Métricas e Tracing Distribuído com OpenTelemetry)** e integridade no processamento assíncrono (**Filas, Mensageria, Dead Letter Queues e Backpressure**). A auditoria também cobre **Logging de Segurança e Monitoramento de Detecção** conforme o **OWASP Top 10 Proactive Controls 2024 — C9**.
 
 Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um relatório completo em formato PDF e templates de Issues em Markdown para o GitHub.
 
@@ -36,6 +36,19 @@ Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um 
 ### 4. Ciclo de Vida e Encerramento Gracioso (Graceful Shutdown)
 - [ ] **Manipulação de Sinais de Sistema:** Verifique se a aplicação captura sinais `SIGTERM` e `SIGINT` para drenar requisições em andamento antes de desligar, rejeitando novas conexões com `HTTP 503` durante a drenagem.
 - [ ] **Fechamento Seguro de Conexões:** Garanta que no shutdown o sistema feche conexões de banco de dados, pools do Redis, canais de mensageria e finalize jobs em andamento sem perda de dados.
+
+### 5. Logging de Segurança e Monitoramento de Detecção (OWASP Proactive Control C9)
+
+Aplique o **OWASP Cheat Sheet Series** (*Logging, Application Logging Vocabulary, Logging Cheat Sheet*) e **A09:2021 — Security Logging and Monitoring Failures**.
+
+- [ ] **Eventos de Segurança Auditados:** Verifique se são logados com contexto suficiente (ator, IP, recurso, ação, resultado, timestamp UTC, correlation ID): sucesso e falha de login, logout, troca de senha/e-mail/MFA, falha de autorização (`403`), criação/alteração de permissão e role, acesso a dado sensível/exportação em massa, invalidação de sessão, uso de token de reset, e eventos administrativos.
+- [ ] **Redação de Dados Sensíveis no Log (Anti-Leak):** Verifique que senhas, tokens, chaves, cookies de sessão, PAN/cartão, PII e o corpo bruto de requisições sensíveis **nunca** são gravados em log; existência de um filtro/serializer central de redação aplicado a todos os appenders (inclusive logs de exceção e de acesso).
+- [ ] **Integridade e Retenção dos Logs:** Verifique envio dos logs para um destino centralizado append-only fora do host da aplicação (SIEM/coletor), com retenção definida e proteção contra adulteração/expurgo pelo processo da aplicação; relógio sincronizado (NTP) e timestamps em UTC/ISO-8601.
+- [ ] **Prevenção de Log Injection:** Verifique neutralização de CR/LF e caracteres de controle em valores vindos do usuário antes de concatenar em mensagens de log (evita forja de linhas de log e quebra de parsers).
+- [ ] **Vocabulário e Nível Consistentes:** Verifique uso de um vocabulário de eventos padronizado (ex: `authn_login_success`, `authz_fail`, `authn_token_reuse`) e níveis coerentes (evento de segurança não afogado em `DEBUG`).
+- [ ] **Alertas e Casos de Detecção Acionáveis:** Verifique existência de regras de alerta sobre picos de `403`/falha de login, reuso de refresh token, criação de conta admin, desativação de MFA, acesso fora de horário/geografia atípica, e volume anômalo de exportação — com destino de notificação definido (on-call/canal), não apenas dashboard.
+- [ ] **Monitoramento de Disponibilidade do Pipeline de Log:** Verifique alerta para "parou de receber logs" (falha silenciosa do coletor) e para descarte de logs por backpressure.
+- [ ] **Sem Dependência de Log do Cliente:** Verifique que decisões de detecção/forense não dependem de logs gerados no navegador/app móvel (não confiáveis).
 
 ---
 

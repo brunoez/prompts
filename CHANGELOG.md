@@ -5,6 +5,27 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/lang/pt-BR/).
 
+## [1.8.0] - 2026-09-10
+
+### Adicionado & Aprimorado (Cobertura Completa do OWASP Top 10 Proactive Controls 2024)
+
+Fechamento das lacunas da suíte frente aos [OWASP Top 10 Proactive Controls (2024)](https://top10proactive.owasp.org/) e à [OWASP Cheat Sheet Series](https://cheatsheetseries.owasp.org/).
+
+- **Novos prompts de auditoria em `prompts/security/`:**
+  - **`authn_identity.md` (C7 – Secure Digital Identities):** hashing de senha (`Argon2id`), comparação em tempo constante, anti-enumeração, regeneração de sessão (*Session Fixation*), atributos de cookie, MFA/2FA + backup codes, JWT (rejeição de `alg:none`, validação de `iss`/`aud`/`exp`, rotação e revogação de refresh token), OAuth2/OIDC com Authorization Code + PKCE, `state`/`nonce` e allow-list de `redirect_uri`, e fluxos de reset/verificação de conta sem *Account Takeover*.
+  - **`access_control.md` (C1 – Implement Access Control / A01:2021):** *deny-by-default*, centralização da decisão de autorização, *enforcement* server-side, IDOR/BOLA com checagem de titularidade e escopo na query (RLS), escalada vertical/BFLA, bypass por verbo HTTP, isolamento multi-tenant, testes negativos de autorização e *fail closed*.
+  - **`ssrf.md` (C10 – Stop SSRF / A10:2021):** mapa de *sinks* de saída (webhooks, HTML→PDF, proxies de imagem, `$ref` remoto, XXE), *allow-list* de destino, validação pós-resolução DNS + *pinning* (anti DNS rebinding), bloqueio de faixas privadas/link-local, proteção do endpoint de metadata de nuvem (`169.254.169.254`, IMDSv2), *egress filtering* e tratamento de resposta anti-exfiltração.
+  - **`secure_config.md` (C5 – Secure by Default / A05:2021):** estado default seguro, debug/stack traces desligados em produção, ausência de credenciais padrão, headers defensivos (`HSTS`, `CSP`, `X-Content-Type-Options`, `frame-ancestors`, `Referrer-Policy`, `Permissions-Policy`), CORS com *allow-list* estrita, atributos de cookie + CSRF, TLS 1.2+/1.3 obrigatório e *hardening* de container.
+  - **`input_validation.md` (C3 – Validate Input & Handle Exceptions):** validação positiva (*allow-list*) em toda fronteira de confiança (incluindo consumidores de fila e webhooks), canonicalização Unicode antes da validação, schema estrito anti *Mass Assignment*, deserialização segura (XXE, *zip slip*, *zip bomb*, *formula injection*), parametrização de *sinks* e tratamento centralizado de exceções sem vazamento de stack trace.
+- **Estendido — `devops/resilience_observability.md` (C9 – Security Logging & Monitoring):**
+  - Nova seção **"Logging de Segurança e Monitoramento de Detecção"**: eventos de segurança auditados com contexto, redação obrigatória de segredos/PII em todos os *appenders*, integridade e retenção de logs *append-only*, prevenção de *Log Injection* (CR/LF), vocabulário de eventos padronizado, regras de alerta acionáveis e monitoramento da disponibilidade do próprio *pipeline* de logs.
+- **Documentação (`README.md`):**
+  - Nova seção **"🧭 Cobertura vs OWASP Top 10 Proactive Controls (2024)"** com matriz C1–C10 → prompt(s) responsável(is) → Cheat Sheets aplicados.
+  - Catálogo de Segurança e árvore de diretórios atualizados com os 5 novos prompts.
+- **Validação Automatizada (`tests/test_integrity.py` & `install.sh`):**
+  - Registro dos 5 novos prompts em `EXPECTED_PROMPTS` e `PROMPT_FILES` (catálogo total: **24 prompts**).
+  - Contagem de prompts na bateria de testes passou a ser dinâmica (`len(EXPECTED_PROMPTS)`), eliminando *drift* de números fixos.
+
 ## [1.7.0] - 2026-09-03
 
 ### Adicionado & Aprimorado (Suporte Nativo ao Claude Code & Multi-IDE Sync)

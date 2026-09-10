@@ -32,6 +32,11 @@ EXPECTED_PROMPTS = [
     "security/supply_chain.md",
     "security/threat_modeling.md",
     "security/ai_appsec.md",
+    "security/authn_identity.md",
+    "security/access_control.md",
+    "security/ssrf.md",
+    "security/secure_config.md",
+    "security/input_validation.md",
     "devops/cicd_pipeline.md",
     "devops/iac_docker_k8s.md",
     "devops/resilience_observability.md",
@@ -46,7 +51,7 @@ REQUIRED_SECTIONS = [
 
 
 def test_prompts_exist():
-    print("🔍 [1/6] Verificando existência física de todos os 19 prompts...")
+    print(f"🔍 [1/6] Verificando existência física de todos os {len(EXPECTED_PROMPTS)} prompts...")
     missing = []
     for rel_path in EXPECTED_PROMPTS:
         full_path = PROMPTS_DIR / rel_path
