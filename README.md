@@ -20,7 +20,7 @@
 
 Criado com foco na comunidade brasileira de desenvolvimento e AppSec, este repositório aberto reúne **prompts técnicos de alto nível** projetados para serem executados por Engenheiros Principais ou Agentes de IA (**Claude Code**, **VSCode** / GitHub Copilot, **Cursor** e outros editores como Windsurf e Antigravity).
 
-O objetivo é transformar a velocidade do **Vibe Coding** em software de **nível corporativo**: seguro contra vulnerabilidades (**OWASP ASTF 2023**, **WSTG v4.2** e **OWASP Cheat Sheet Series**), arquiteturalmente consistente (DDD/SDD), resiliente em produção (SRE) e 100% testado (TDD, BDD, SecDD).
+O objetivo é transformar a velocidade do **Vibe Coding** em software de **nível corporativo**: seguro contra vulnerabilidades (**OWASP ASTF 2023**, **WSTG v4.2**, **OWASP Top 10 Proactive Controls 2024** e **OWASP Cheat Sheet Series**), arquiteturalmente consistente (DDD/SDD), resiliente em produção (SRE) e 100% testado (TDD, BDD, SecDD).
 
 ---
 
@@ -63,13 +63,18 @@ seu-projeto/
 │   │   ├── tdd_test_driven.md         # TDD Red-Green-Refactor
 │   │   ├── test_suite_generator.md    # Gerador de Testes QA
 │   │   └── technical_documentation.md # Docs-as-Code & C4
-│   ├── security/                 # Auditorias de AppSec (OWASP ASTF / WSTG)
+│   ├── security/                 # Auditorias de AppSec (OWASP ASTF / WSTG / Proactive Controls)
+│   │   ├── access_control.md          # Proactive C1 – Autorização & IDOR/BOLA
 │   │   ├── ai_appsec.md               # OWASP LLM Top 10
 │   │   ├── api.md                     # OWASP API Top 10 (ASTF)
+│   │   ├── authn_identity.md          # Proactive C7 – Autenticação, Sessão, MFA & OIDC
 │   │   ├── business.md                # Fraudes & Idempotência
 │   │   ├── db.md                      # OWASP DB & Concorrência
 │   │   ├── frontend.md                # Trusted Types, CSP & SPAs
+│   │   ├── input_validation.md        # Proactive C3 – Validação de Entrada & Exceções
 │   │   ├── secrets.md                 # TruffleHog3 & Argon2id
+│   │   ├── secure_config.md           # Proactive C5 – Config Segura, Headers & CORS
+│   │   ├── ssrf.md                    # Proactive C10 – Server-Side Request Forgery
 │   │   ├── supply_chain.md            # SCVS, SBOM & Anti-Slopsquatting
 │   │   └── threat_modeling.md         # Modelagem STRIDE-per-Element
 │   └── devops/                   # Infraestrutura & SRE
