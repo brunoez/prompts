@@ -300,6 +300,11 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
 | [`frontend.md`](prompts/security/frontend.md) | **Frontend (OWASP Client-Side)** | DOM XSS, Trusted Types API, segurança de `window.postMessage`, prefixos de cookies seguros (`__Host-`), CSP, Clickjacking e Core Web Vitals. |
 | [`secrets.md`](prompts/security/secrets.md) | **Gestão de Segredos & Criptografia** | Scanner automatizado com `trufflehog3`, padrão ouro de hashing de senhas (`Argon2id`), prevenção de Timing Attacks e limpeza de memória (*zeroization*). |
 | [`ai_appsec.md`](prompts/security/ai_appsec.md) | **Aplicações de IA (OWASP LLM)** | Injeção direta/indireta de prompt, Insecure Output Handling, Excessive Agency e isolamento de tenants em RAG/vetores. |
+| [`authn_identity.md`](prompts/security/authn_identity.md) | **Identidades Digitais (OWASP Proactive C7)** | Autenticação e hashing de senha (`Argon2id`), regeneração de sessão (Session Fixation), MFA/2FA e backup codes, JWT (rejeição de `alg:none`), OAuth2/OIDC com PKCE + `state`/`nonce`, fluxos de reset/verificação de conta sem enumeração e sem ATO. |
+| [`access_control.md`](prompts/security/access_control.md) | **Controle de Acesso (OWASP Proactive C1 / A01)** | Deny-by-default, autorização centralizada, IDOR/BOLA com checagem de titularidade e escopo na query, escalada vertical/BFLA, isolamento multi-tenant, testes negativos de autorização e fail-closed. |
+| [`ssrf.md`](prompts/security/ssrf.md) | **SSRF (OWASP Proactive C10 / A10)** | Mapa de sinks de saída (webhooks, HTML→PDF, proxies de imagem, `$ref` remoto, XXE), allow-list de destino, validação pós-DNS + pinning (anti DNS rebinding), bloqueio de metadata cloud (`169.254.169.254`), egress filtering e IMDSv2. |
+| [`secure_config.md`](prompts/security/secure_config.md) | **Configuração Segura por Padrão (OWASP Proactive C5 / A05)** | Secure-by-default, debug/stack traces off, credenciais default, headers (`HSTS`, `CSP`, `nosniff`, `frame-ancestors`), CORS com allow-list estrita, atributos de cookie + CSRF, TLS 1.2+/1.3 e hardening de container. |
+| [`input_validation.md`](prompts/security/input_validation.md) | **Validação de Entrada & Exceções (OWASP Proactive C3)** | Validação positiva (allow-list) em toda fronteira de confiança, canonicalização Unicode, schema estrito anti Mass Assignment, deserialização segura (XXE, zip slip), parametrização de sinks e tratamento centralizado de erros sem vazamento de stack trace. |
 
 ---
 
@@ -310,6 +315,25 @@ Disponibilizamos modelos prontos para copiar e colar na pasta [`examples/ci-cd/`
 | [`cicd_pipeline.md`](prompts/devops/cicd_pipeline.md) | **Hardening de CI/CD (OWASP CI/CD)** | Prevenção de script injection em GitHub Actions/GitLab CI, autenticação OIDC federada, pinning de actions por SHA256 e runners isolados. |
 | [`iac_docker_k8s.md`](prompts/devops/iac_docker_k8s.md) | **IaC, Containers & K8s** | Terraform IAM least privilege, Docker rootless e multi-stage, K8s securityContext, NetworkPolicies e Probes. |
 | [`resilience_observability.md`](prompts/devops/resilience_observability.md) | **Resiliência & Observabilidade** | Mensageria assíncrona, Dead Letter Queues (DLQ), Circuit Breakers, tracing distribuído com OpenTelemetry e Graceful Shutdown. |
+
+---
+
+## 🧭 Cobertura vs OWASP Top 10 Proactive Controls (2024)
+
+Mapa de qual prompt exerce cada [Proactive Control](https://top10proactive.owasp.org/) e quais [Cheat Sheets](https://cheatsheetseries.owasp.org/) ele aplica.
+
+| Proactive Control | Prompt(s) principal(is) | Cheat Sheets aplicados |
+| :--- | :--- | :--- |
+| **C1** – Implement Access Control | [`access_control.md`](prompts/security/access_control.md), `business.md`, `secdd_abuse_cases.md` | Authorization, Access Control, IDOR Prevention, Transaction Authorization |
+| **C2** – Use Cryptography Properly | [`secrets.md`](prompts/security/secrets.md), `db.md` | Cryptographic Storage, Key Management, Password Storage |
+| **C3** – Validate Input & Handle Exceptions | [`input_validation.md`](prompts/security/input_validation.md), `api.md`, `db.md`, `frontend.md` | Input Validation, Mass Assignment, Deserialization, Error Handling, Injection Prevention, XXE Prevention |
+| **C4** – Address Security from the Start | [`threat_modeling.md`](prompts/security/threat_modeling.md), `sdd_spec_driven.md` | Threat Modeling, Attack Surface Analysis, Abuse Case |
+| **C5** – Secure by Default Configurations | [`secure_config.md`](prompts/security/secure_config.md), `iac_docker_k8s.md`, `frontend.md` | HTTP Security Response Headers, CSP, TLS, HSTS, CSRF Prevention, Docker Security |
+| **C6** – Keep Components Secure | [`supply_chain.md`](prompts/security/supply_chain.md) | Vulnerable Dependency Management, SCVS, NPM Security |
+| **C7** – Secure Digital Identities | [`authn_identity.md`](prompts/security/authn_identity.md), `secrets.md` | Authentication, Session Management, JWT, Forgot Password, MFA, Credential Stuffing Prevention |
+| **C8** – Leverage Browser Security Features | [`frontend.md`](prompts/security/frontend.md) | XSS Prevention, DOM XSS, Content Security Policy, Clickjacking Defense |
+| **C9** – Security Logging & Monitoring | [`resilience_observability.md`](prompts/devops/resilience_observability.md), `business.md` | Logging, Application Logging Vocabulary |
+| **C10** – Stop Server-Side Request Forgery | [`ssrf.md`](prompts/security/ssrf.md), `api.md` | SSRF Prevention, XXE Prevention |
 
 ---
 
