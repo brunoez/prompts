@@ -42,6 +42,23 @@ EXPECTED_PROMPTS = [
     "devops/resilience_observability.md",
 ]
 
+SECURITY_PROMPTS = [
+    "security/api.md",
+    "security/business.md",
+    "security/db.md",
+    "security/frontend.md",
+    "security/secrets.md",
+    "security/supply_chain.md",
+    "security/threat_modeling.md",
+    "security/ai_appsec.md",
+    "security/authn_identity.md",
+    "security/access_control.md",
+    "security/ssrf.md",
+    "security/secure_config.md",
+    "security/input_validation.md",
+    "driven-development/secdd_abuse_cases.md",
+]
+
 REQUIRED_SECTIONS = [
     "## OBJETIVO",
     "## ESCOPO",
@@ -152,6 +169,27 @@ def test_sync_scripts_unit():
     return True
 
 
+def test_security_standards_coexistence():
+    print(f"🔍 [7/7] Validando coexistência de padrões (OWASP ASVS & OWASP Risk Rating) nos {len(SECURITY_PROMPTS)} prompts de segurança...")
+    errors = []
+    for rel_path in SECURITY_PROMPTS:
+        full_path = PROMPTS_DIR / rel_path
+        content = full_path.read_text(encoding="utf-8")
+        
+        if "OWASP ASVS" not in content and "ASVS" not in content:
+            errors.append(f"Prompt {rel_path} não referencia 'OWASP ASVS'")
+        
+        if "OWASP Risk Rating" not in content and "Risk Rating" not in content:
+            errors.append(f"Prompt {rel_path} não referencia 'OWASP Risk Rating Methodology'")
+
+    if errors:
+        for err in errors:
+            print(f"❌ {err}")
+        return False
+    print(f"✅ Todos os {len(SECURITY_PROMPTS)} prompts de segurança possuem referências completas a ASVS e Risk Rating.")
+    return True
+
+
 def main():
     print("=================================================================")
     print("  🛡️  Bateria de Testes de Integridade & Qualidade da Suíte")
@@ -163,6 +201,7 @@ def main():
         test_readme_links,
         test_installer_execution,
         test_sync_scripts_unit,
+        test_security_standards_coexistence,
     ]
     
     failed = False

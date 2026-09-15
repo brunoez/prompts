@@ -1,7 +1,9 @@
-# PROMPT DE AUDITORIA COMPLETA: CONTROLE DE ACESSO & AUTORIZAÇÃO (OWASP PROACTIVE CONTROL C1), RBAC/ABAC/ReBAC, IDOR/BOLA E GERAÇÃO DE RELATÓRIO PDF
+# PROMPT DE AUDITORIA COMPLETA: CONTROLE DE ACESSO & AUTORIZAÇÃO (OWASP PROACTIVE CONTROL C1, OWASP ASVS v4.0.3 & OWASP RISK RATING METHODOLOGY), RBAC/ABAC/ReBAC, IDOR/BOLA E GERAÇÃO DE RELATÓRIO PDF
 
 ## OBJETIVO
-Atuar como Engenheiro Principal de AppSec e Especialista em Autorização (Access Control Lead / Yellow Team). Sua missão é realizar uma varredura completa no repositório aplicando o **OWASP Top 10 Proactive Controls 2024 — C1: Implement Access Control** e as diretrizes do **OWASP Cheat Sheet Series** (*Authorization, Access Control, Insecure Direct Object Reference Prevention, Transaction Authorization*), reforçadas pelos testes de código do **OWASP WSTG v4.2** (*WSTG-ATHZ*) e pela categoria **A01:2021 — Broken Access Control**.
+Atuar como Engenheiro Principal de AppSec e Especialista em Autorização (Access Control Lead / Yellow Team). Sua missão é realizar uma varredura completa no repositório aplicando o **OWASP Top 10 Proactive Controls 2024 — C1: Implement Access Control**, as diretrizes do **OWASP Cheat Sheet Series** (*Authorization, Access Control, Insecure Direct Object Reference Prevention, Transaction Authorization*), os testes de código do **OWASP WSTG v4.2** (*WSTG-ATHZ*), a categoria **A01:2021 — Broken Access Control** e os requisitos normativos do **OWASP Application Security Verification Standard (OWASP ASVS v4.0.3)** (Capítulo V4 - Access Control Verification Requirements).
+
+A severidade de cada vulnerabilidade identificada deve ser formalmente mensurada aplicando o **OWASP Risk Rating Methodology**, combinando a Probabilidade (*Likelihood*) com o Impacto (*Impact*) em uma matriz determinística 3x3.
 
 A auditoria deve garantir negação por padrão (*deny-by-default*), centralização da decisão de autorização, verificação de titularidade de objeto em toda camada (rota, serviço, dado), isolamento multi-tenant, ausência de escalada de privilégio horizontal/vertical e proteção de funções administrativas.
 
@@ -19,38 +21,38 @@ Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um 
 
 ---
 
-## CHECKLIST DE AUDITORIA PRÁTICA (OWASP PROACTIVE C1 & CHEAT SHEETS)
+## CHECKLIST DE AUDITORIA PRÁTICA (OWASP PROACTIVE C1, CHEAT SHEETS & OWASP ASVS v4.0.3)
 
-### 1. Princípios Fundamentais (Authorization + Access Control Cheat Sheets)
-- [ ] **Deny-by-Default:** Verifique se toda rota/handler/recurso nega acesso por padrão e só libera mediante regra explícita — nunca "libera se não houver regra que bloqueie". Rotas novas sem decorator de autorização devem falhar fechado.
-- [ ] **Centralização da Decisão:** Verifique se a autorização passa por um componente único e testável (middleware, *policy engine*, service) em vez de checagens `if role ==` espalhadas e divergentes por controller.
-- [ ] **Enforcement no Servidor:** Verifique que nenhuma decisão de acesso depende de flag vinda do cliente (campo `isAdmin` no body/JWT não verificado, parâmetro `?role=`, ocultar botão no frontend sem bloquear a rota).
-- [ ] **Menor Privilégio:** Verifique se roles/scopes concedidos são os mínimos necessários; ausência de role "god"/wildcard (`*:*`) atribuída por conveniência a serviços ou usuários internos.
-- [ ] **Separação de Deveres e Contexto:** Operações críticas (aprovar pagamento, alterar permissão de outro usuário) exigem papel distinto de quem originou a ação e re-autenticação/*step-up* quando aplicável (Transaction Authorization Cheat Sheet).
+### 1. Princípios Fundamentais (Authorization + Access Control Cheat Sheets & ASVS V4.1)
+- [ ] **Deny-by-Default & ASVS V4.1.1 (L1):** Verifique se toda rota/handler/recurso nega acesso por padrão e só libera mediante regra explícita — nunca "libera se não houver regra que bloqueie". Rotas novas sem decorator de autorização devem falhar fechado.
+- [ ] **Centralização da Decisão & ASVS V4.1.2 (L2):** Verifique se a autorização passa por um componente único e testável (middleware, *policy engine*, service) em vez de checagens `if role ==` espalhadas e divergentes por controller.
+- [ ] **Enforcement no Servidor & ASVS V4.1.3 (L1):** Verifique que nenhuma decisão de acesso depende de flag vinda do cliente (campo `isAdmin` no body/JWT não verificado, parâmetro `?role=`, ocultar botão no frontend sem bloquear a rota).
+- [ ] **Menor Privilégio & ASVS V4.1.5 (L2):** Verifique se roles/scopes concedidos são os mínimos necessários; ausência de role "god"/wildcard (`*:*`) atribuída por conveniência a serviços ou usuários internos.
+- [ ] **Separação de Deveres e Contexto & ASVS V4.1.4 (L3):** Operações críticas (aprovar pagamento, alterar permissão de outro usuário) exigem papel distinto de quem originou a ação e re-autenticação/*step-up* quando aplicável (Transaction Authorization Cheat Sheet).
 
-### 2. IDOR / BOLA — Autorização em Nível de Objeto (IDOR Prevention Cheat Sheet — WSTG-ATHZ-04)
-- [ ] **Verificação de Titularidade:** Para cada endpoint com identificador na rota/query/body (`/orders/{id}`, `/users/{uuid}/cards`, `?accountId=`), verifique se o código confirma que o objeto pertence ao `user_id`/`tenant_id` autenticado **antes** de ler/alterar — não apenas `findById(id)`.
-- [ ] **Referências Indiretas ou Não Adivinháveis:** Verifique uso de UUIDv4/identificadores por-usuário no lugar de inteiros sequenciais previsíveis; a ausência de IDs sequenciais não substitui a checagem de titularidade, mas reduz enumeração.
-- [ ] **Escopo na Query, não no Código de Aplicação:** Prefira `WHERE id = ? AND tenant_id = ?` (ou Row-Level Security no banco) a buscar por `id` e filtrar depois em memória — filtragem pós-consulta é frágil e vaza via contagem/paginação.
-- [ ] **Mass Assignment / BOPLA:** Verifique se endpoints de criação/atualização aceitam campos que controlam acesso (`role`, `owner_id`, `tenant_id`, `is_verified`) sem *allow-list* estrita de propriedades graváveis.
-- [ ] **Objetos Aninhados e Batch:** Verifique autorização em cada item de operações em lote (`PATCH /items` com array de IDs), em sub-recursos (`/orders/{id}/items/{itemId}`) e em expansões GraphQL (`order { customer { ssn } }`).
+### 2. IDOR / BOLA — Autorização em Nível de Objeto (IDOR Prevention Cheat Sheet — WSTG-ATHZ-04 & ASVS V4.2)
+- [ ] **Verificação de Titularidade & ASVS V4.2.1 (L1):** Para cada endpoint com identificador na rota/query/body (`/orders/{id}`, `/users/{uuid}/cards`, `?accountId=`), verifique se o código confirma que o objeto pertence ao `user_id`/`tenant_id` autenticado **antes** de ler/alterar — não apenas `findById(id)`.
+- [ ] **Referências Indiretas ou Não Adivinháveis & ASVS V4.2.2 (L2):** Verifique uso de UUIDv4/identificadores por-usuário no lugar de inteiros sequenciais previsíveis; a ausência de IDs sequenciais não substitui a checagem de titularidade, mas reduz enumeração.
+- [ ] **Escopo na Query, não no Código de Aplicação & ASVS V4.2.3 (L2):** Prefira `WHERE id = ? AND tenant_id = ?` (ou Row-Level Security no banco) a buscar por `id` e filtrar depois em memória — filtragem pós-consulta é frágil e vaza via contagem/paginação.
+- [ ] **Mass Assignment / BOPLA & ASVS V4.2.4 (L2):** Verifique se endpoints de criação/atualização aceitam campos que controlam acesso (`role`, `owner_id`, `tenant_id`, `is_verified`) sem *allow-list* estrita de propriedades graváveis.
+- [ ] **Objetos Aninhados e Batch & ASVS V4.2.5 (L2):** Verifique autorização em cada item de operações em lote (`PATCH /items` com array de IDs), em sub-recursos (`/orders/{id}/items/{itemId}`) e em expansões GraphQL (`order { customer { ssn } }`).
 
-### 3. Escalada Vertical e Funções Administrativas (WSTG-ATHZ-02 / BFLA)
-- [ ] **Rotas Admin:** Verifique que endpoints administrativos exigem role/scope específico e não apenas "usuário autenticado"; ausência de rotas admin acessíveis por adivinhação de caminho (`/admin`, `/internal`, `/api/v1/debug`) sem checagem.
-- [ ] **Bypass por Método/Verbo HTTP:** Verifique que trocar `GET` por `POST/PUT/DELETE`, usar `X-HTTP-Method-Override` ou content-type alternativo não contorna o guard de autorização.
-- [ ] **Force Browsing / Falta de Checagem Pós-Navegação:** Verifique que etapas de um fluxo (wizard, checkout, aprovação) revalidam permissão em cada passo, não só no primeiro.
-- [ ] **Endpoints de Gestão de Usuário:** `PATCH /users/{id}/role`, convites, reset de MFA de terceiros — verifique que só admin do mesmo tenant executa e que ninguém eleva o próprio privilégio.
+### 3. Escalada Vertical e Funções Administrativas (WSTG-ATHZ-02 / BFLA & ASVS V4.3)
+- [ ] **Rotas Admin & ASVS V4.3.1 (L1):** Verifique que endpoints administrativos exigem role/scope específico e não apenas "usuário autenticado"; ausência de rotas admin acessíveis por adivinhação de caminho (`/admin`, `/internal`, `/api/v1/debug`) sem checagem.
+- [ ] **Bypass por Método/Verbo HTTP & ASVS V4.3.2 (L2):** Verifique que trocar `GET` por `POST/PUT/DELETE`, usar `X-HTTP-Method-Override` ou content-type alternativo não contorna o guard de autorização.
+- [ ] **Force Browsing / Falta de Checagem Pós-Navegação & ASVS V4.3.3 (L2):** Verifique que etapas de um fluxo (wizard, checkout, aprovação) revalidam permissão em cada passo, não só no primeiro.
+- [ ] **Endpoints de Gestão de Usuário & ASVS V4.1.3, V4.3.1 (L2):** `PATCH /users/{id}/role`, convites, reset de MFA de terceiros — verifique que só admin do mesmo tenant executa e que ninguém eleva o próprio privilégio.
 
-### 4. Isolamento Multi-Tenant e Consistência
-- [ ] **Tenant Boundary:** Verifique que todo acesso a dado carrega o `tenant_id` da sessão como filtro obrigatório e não confia em `tenant_id` enviado pelo cliente. Teste mental da **Matriz de Autorização Cruzada** (Tenant A acessando recurso do Tenant B).
-- [ ] **Caches e Chaves Compartilhadas:** Verifique que chaves de cache, nomes de arquivo em storage e chaves de idempotência incluem o escopo do tenant/usuário para evitar vazamento cruzado.
-- [ ] **Jobs Assíncronos e Webhooks:** Verifique que workers e handlers de eventos recarregam e revalidam o contexto de autorização em vez de confiar em payload serializado antigo.
-- [ ] **Consistência entre Camadas:** Verifique que API, GraphQL, gRPC, exportações/relatórios e endpoints legados aplicam a **mesma** regra de acesso ao mesmo recurso.
+### 4. Isolamento Multi-Tenant e Consistência (ASVS V4.1, V4.2)
+- [ ] **Tenant Boundary & ASVS V4.1.3, V4.2.1 (L2):** Verifique que todo acesso a dado carrega o `tenant_id` da sessão como filtro obrigatório e não confia em `tenant_id` enviado pelo cliente. Teste mental da **Matriz de Autorização Cruzada** (Tenant A acessando recurso do Tenant B).
+- [ ] **Caches e Chaves Compartilhadas & ASVS V4.2.2 (L2):** Verifique que chaves de cache, nomes de arquivo em storage e chaves de idempotência incluem o escopo do tenant/usuário para evitar vazamento cruzado.
+- [ ] **Jobs Assíncronos e Webhooks & ASVS V4.1.2 (L2):** Verifique que workers e handlers de eventos recarregam e revalidam o contexto de autorização em vez de confiar em payload serializado antigo.
+- [ ] **Consistência entre Camadas & ASVS V4.1.1 (L2):** Verifique que API, GraphQL, gRPC, exportações/relatórios e endpoints legados aplicam a **mesma** regra de acesso ao mesmo recurso.
 
-### 5. Testabilidade e Observabilidade da Autorização
-- [ ] **Testes Negativos de Autorização:** Verifique existência de testes automatizados que esperam `403 Forbidden` / `404` para acesso cruzado (usuário A ao recurso de B, tenant cruzado, não-admin em rota admin).
-- [ ] **Log de Decisão de Acesso:** Verifique que negações de autorização são logadas com ator, recurso, ação e resultado (para detecção de abuso — ver também Proactive C9).
-- [ ] **Fail Closed em Erro:** Verifique que exceção no *policy engine* ou timeout de consulta de permissão resulta em negação, nunca em liberação.
+### 5. Testabilidade e Observabilidade da Autorização (ASVS V4.1, V7.1)
+- [ ] **Testes Negativos de Autorização & ASVS V4.1.1 (L2):** Verifique existência de testes automatizados que esperam `403 Forbidden` / `404` para acesso cruzado (usuário A ao recurso de B, tenant cruzado, não-admin em rota admin).
+- [ ] **Log de Decisão de Acesso & ASVS V7.1.1 (L2):** Verifique que negações de autorização são logadas com ator, recurso, ação e resultado (para detecção de abuso — ver também Proactive C9).
+- [ ] **Fail Closed em Erro & ASVS V4.1.1 (L1):** Verifique que exceção no *policy engine* ou timeout de consulta de permissão resulta em negação, nunca em liberação.
 
 ---
 
@@ -59,13 +61,21 @@ Ao final da auditoria, você deve listar os achados no chat/terminal e gerar um 
 Ao finalizar a análise técnica, exiba no chat a lista detalhada de achados ordenada por prioridade:
 
 ### PARTE 1: MATRIZ DE PRIORIZAÇÃO E QUICK WINS
-Apresente uma tabela inicial contendo TODOS os achados:
+Apresente uma tabela inicial contendo TODOS os achados, avaliados segundo o **OWASP Risk Rating Methodology**:
 
-| ID | Arquivo / Ponto | Módulo / Padrão | Severidade | Esforço Estimado | Quick Win? |
-|---|---|---|---|---|---|
-| #1 | `src/controllers/invoice.ts:31` | BOLA / IDOR (sem checagem de titularidade) | CRÍTICA | Baixo (30 min) | **SIM** |
-| #2 | `src/routes/admin.ts:8` | Rota admin sem checagem de role | CRÍTICA | Baixo (20 min) | **SIM** |
-| #3 | `src/services/report.ts:120` | Filtro de tenant só em memória | ALTA | Médio (3 hrs) | NÃO |
+$$\text{Risco (Severidade)} = \text{Probabilidade (Likelihood)} \times \text{Impacto (Impact)}$$
+
+*Critério da Matriz 3x3 OWASP:*
+- **Alta Probabilidade × Alto Impacto** = **CRÍTICA**
+- **Alta × Médio** ou **Média × Alto** = **ALTA**
+- **Alta × Baixo**, **Média × Médio** ou **Baixa × Alto** = **MÉDIA**
+- **Média × Baixo**, **Baixa × Médio** ou **Baixa × Baixo** = **BAIXA**
+
+| ID | Arquivo / Ponto | Módulo / Padrão / ASVS | Probabilidade | Impacto | Severidade (RRM) | Esforço Estimado | Quick Win? |
+|---|---|---|---|---|---|---|---|
+| #1 | `src/controllers/invoice.ts:31` | BOLA / IDOR / ASVS V4.2.1 (L1) | ALTA | ALTO | CRÍTICA | Baixo (30 min) | **SIM** |
+| #2 | `src/routes/admin.ts:8` | Rota admin sem role / ASVS V4.3.1 (L1) | ALTA | ALTO | CRÍTICA | Baixo (20 min) | **SIM** |
+| #3 | `src/services/report.ts:120` | Filtro tenant memória / ASVS V4.2.3 (L2) | MÉDIA | ALTO | ALTA | Médio (3 hrs) | NÃO |
 
 *(Quick Win: Problema de Severidade ALTA ou CRÍTICA com Esforço de Correção BAIXO).*
 
@@ -73,7 +83,12 @@ Apresente uma tabela inicial contendo TODOS os achados:
 Para CADA item da tabela:
 - **Achado #[ID]:** [Nome do Problema]
 - **Controle / Cheat Sheet:** [ex: Proactive C1 / IDOR Prevention Cheat Sheet / WSTG-ATHZ-04 / A01:2021]
-- **Severidade:** [CRÍTICA | ALTA | MÉDIA | BAIXA]
+- **OWASP ASVS v4.0.3:** [Capítulo e Requisito, ex: V4.2.1 (Level 1 - Object Level Access Control)]
+- **Avaliação de Risco (OWASP Risk Rating Methodology):**
+  - *Probabilidade (Likelihood):* [BAIXA | MÉDIA | ALTA] (Agente de Ameaça + Facilidade de Descoberta/Exploração)
+  - *Impacto Técnico (Tech Impact):* [BAIXO | MÉDIO | ALTO] (Confidencialidade, Integridade, Disponibilidade)
+  - *Impacto de Negócio (Business Impact):* [BAIXO | MÉDIO | ALTO] (Danos Financeiros, LGPD/GDPR, Reputação)
+  - *Severidade Calculada:* [CRÍTICA | ALTA | MÉDIA | BAIXA]
 - **Esforço de Correção:** [BAIXO | MÉDIO | ALTO]
 - **Tag:** [QUICK WIN] *(se aplicável)*
 - **Arquivo/Linha:** `caminho/do/arquivo.ext:linha`
@@ -90,14 +105,14 @@ Para CADA item da tabela:
 DEPOIS DA AUDITORIA, crie e execute um script automatizado salvo em `docs/access-control-audit/generate_report.py` para produzir:
 
 1. **Relatório em PDF (`docs/access-control-audit/relatorio-auditoria-autorizacao.pdf`):**
-   - **Capa:** Título "Relatório de Auditoria de Controle de Acesso (OWASP Proactive C1) — <nome do projeto>", data e escopo.
-   - **Resumo Executivo:** Gráfico de rosca por severidade e gráfico de barras por categoria (Deny-by-Default, IDOR/BOLA, Escalada Vertical, Multi-Tenant, Testabilidade).
+   - **Capa:** Título "Relatório de Auditoria de Controle de Acesso & ASVS (OWASP Proactive C1) — <nome do projeto>", data e escopo.
+   - **Resumo Executivo:** Gráfico de rosca por severidade, gráfico de barras por categoria e Matriz de Calor 3x3 do OWASP Risk Rating Methodology (Likelihood × Impact).
    - **Paleta oficial:** Crítica `#B91C1C`, Alta `#EA580C`, Média `#D97706`, Baixa `#2563EB`, Ponto Forte `#059669`.
-   - **Matriz de Acesso Auditada:** Tabela recurso × papel com status esperado vs implementado.
-   - **Tabela Detalhada de Achados** com tags de Quick Win e referências a arquivos e linhas.
+   - **Matriz de Acesso Auditada & ASVS:** Tabela recurso × papel com status esperado vs implementado e conformidade ASVS V4 (L1/L2/L3).
+   - **Tabela Detalhada de Achados** com tags de Quick Win, notas de risco RRM e referências a arquivos e linhas.
 
 2. **Seção "ISSUES PARA O GITHUB" no Relatório:**
-   - Template Markdown completo pronto para copiar e colar para cada achado, com labels, passos de reprodução, impacto e critérios de aceite.
+   - Template Markdown completo pronto para copiar e colar para cada achado, com labels, passos de reprodução, avaliação de risco formal (RRM: Probabilidade x Impacto), impacto e critérios de aceite.
 
 ### REGRAS TÉCNICAS
 - Use ambiente Python isolado (`venv` temporário com `reportlab` e `matplotlib`).

@@ -20,7 +20,7 @@
 
 Criado com foco na comunidade brasileira de desenvolvimento e AppSec, este repositório aberto reúne **prompts técnicos de alto nível** projetados para serem executados por Engenheiros Principais ou Agentes de IA (**Claude Code**, **VSCode** / GitHub Copilot, **Cursor** e outros editores como Windsurf e Antigravity).
 
-O objetivo é transformar a velocidade do **Vibe Coding** em software de **nível corporativo**: seguro contra vulnerabilidades (**OWASP ASTF 2023**, **WSTG v4.2**, **OWASP Top 10 Proactive Controls 2024** e **OWASP Cheat Sheet Series**), arquiteturalmente consistente (DDD/SDD), resiliente em produção (SRE) e 100% testado (TDD, BDD, SecDD).
+O objetivo é transformar a velocidade do **Vibe Coding** em software de **nível corporativo**: seguro contra vulnerabilidades (**OWASP ASTF 2023**, **WSTG v4.2**, **OWASP Top 10 Proactive Controls 2024**, **OWASP ASVS v4.0.3**, **OWASP Risk Rating Methodology** e **OWASP Cheat Sheet Series**), arquiteturalmente consistente (DDD/SDD), resiliente em produção (SRE) e 100% testado (TDD, BDD, SecDD).
 
 ---
 
@@ -345,8 +345,8 @@ Mapa de qual prompt exerce cada [Proactive Control](https://top10proactive.owasp
 ## 📊 Entregáveis Padrão Gerados pelos Prompts
 
 Todos os prompts são padronizados para entregar:
-1. **Matriz de Priorização no Terminal:** Tabela com ordenação por Severidade x Esforço e chips de **Quick Wins**.
-2. **Detalhamento Completo dos Achados com PoC & Verificação:** Arquivo/linha, evidência factual, Prova de Conceito (PoC de reprodução), código seguro pronto e comando de verificação pós-correção.
+1. **Matriz de Priorização no Terminal:** Tabela com ordenação por Severidade x Esforço, cálculo pela **OWASP Risk Rating Methodology** (Likelihood x Impact) e chips de **Quick Wins**.
+2. **Detalhamento Completo dos Achados com PoC & Verificação:** Arquivo/linha, evidência factual, mapeamento de conformidade **OWASP ASVS v4.0.3 (L1/L2/L3)**, Prova de Conceito (PoC de reprodução), código seguro pronto e comando de verificação pós-correção.
 3. **Filtro Anti-Fadiga e Anti-Alucinação:** Foco exclusivo no raio de impacto real (*Blast Radius*), descartando falso-positivo teórico e separando sugestões cosméticas (*nits*).
 4. **Relatório em PDF com Gráficos:** Salvo na pasta `docs/<modulo>-audit/`, com design profissional (paleta `#B91C1C` Crítica, `#EA580C` Alta, `#D97706` Média, `#2563EB` Baixa, `#059669` Pontos Fortes).
 5. **Exportação SARIF (quando aplicável):** Arquivos compatíveis com o GitHub Code Scanning / Advanced Security.

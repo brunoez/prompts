@@ -5,6 +5,42 @@ Todas as alterações notáveis neste projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/),
 e este projeto adere ao [Versionamento Semântico (SemVer)](https://semver.org/lang/pt-BR/).
 
+## [1.9.0] - 2026-09-15
+
+### Adicionado & Aprimorado (Integração do OWASP ASVS v4.0.3 & OWASP Risk Rating Methodology)
+
+Enriquecimento estritamente aditivo de todos os 13 prompts de segurança e do prompt de SecDD / Abuse Cases com requisitos formais de verificação e cálculo quantitativo de risco, mantendo 100% dos padrões, frameworks e controles existentes.
+
+- **OWASP Application Security Verification Standard (ASVS v4.0.3):**
+  - Mapeamento explícito de capítulos (V1 a V14) e Níveis de Verificação (L1: Oportunístico/Automático, L2: Aplicações com dados sensíveis, L3: Sistemas críticos) em todos os checklists e relatórios:
+    - `api.md`: Capítulos V13 (API & Web Service), V1 (Architecture) e V14 (Configuration).
+    - `authn_identity.md`: Capítulos V2 (Authentication) e V3 (Session Management).
+    - `access_control.md`: Capítulo V4 (Access Control Verification).
+    - `input_validation.md`: Capítulos V5 (Validation, Sanitization and Encoding) e V7 (Error Handling and Logging).
+    - `db.md`: Capítulos V5 (SQLi), V8 (Data Protection) e V6 (Stored Cryptography).
+    - `frontend.md`: Capítulos V5 (Output Encoding/XSS), V3 (Client Session) e V14 (Configuration).
+    - `business.md`: Capítulos V11 (Business Logic) e V1 (Architecture & Design).
+    - `secrets.md`: Capítulos V6 (Stored Cryptography), V8 (Data Protection) e V14 (Configuration).
+    - `secure_config.md`: Capítulos V14 (Configuration), V7 (Logging/Errors) e V9 (Communications/TLS).
+    - `ssrf.md`: Capítulos V12 (File & Resources - SSRF Protection) e V5 (Input Validation).
+    - `supply_chain.md`: Capítulos V10 (Malicious Code) e V14 (Third-Party Components).
+    - `threat_modeling.md`: Capítulo V1 (Architecture, Design and Threat Modeling).
+    - `ai_appsec.md`: Capítulos V1 (Modelagem), V5 (Validação de Prompts/Inputs) e V10 (Malicious Code).
+    - `secdd_abuse_cases.md`: Capítulos V1 (Architecture) e V11 (Business Logic Testing).
+- **OWASP Risk Rating Methodology (RRM):**
+  - Substituição da severidade intuitiva pelo cálculo formal padronizado pela OWASP: $\text{Severidade} = \text{Probabilidade (Likelihood)} \times \text{Impacto (Impact)}$.
+  - Matriz determinística 3x3 (Alta/Média/Baixa Probabilidade $\times$ Alto/Médio/Baixo Impacto).
+  - Adição de colunas de Probabilidade e Impacto nas tabelas de priorização de todos os prompts.
+  - Card de achado enriquecido com justificativas formais de Agente de Ameaça, Facilidade de Descoberta/Exploração, Impacto Técnico e Impacto de Negócio (financeiro, conformidade regulatória/LGPD e reputação).
+- **Entregáveis Automatizados (PDF, SARIF & GitHub Issues):**
+  - Especificação de inclusão de Matriz de Calor 3x3 (Heatmap Likelihood × Impact) e tabelas de conformidade por capítulo ASVS nos relatórios PDF.
+  - Inclusão de tags `ASVS-V*` e scores de risco no SARIF v2.1.0 para o GitHub Code Scanning.
+  - Templates de issues no GitHub com justificativa de risco quantificada.
+- **Engenharia de Software (SDD & BDD):**
+  - Criação do documento formal de especificação arquitetural (SDD) e cenários executáveis Gherkin (BDD) em `docs/superpowers/plans/2026-09-15-owasp-asvs-risk-rating-integration.md`.
+- **Validação Automatizada de CI/CD (`tests/test_integrity.py`):**
+  - Nova bateria `test_security_standards_coexistence` validando continuamente a coexistência de `OWASP ASVS` e `OWASP Risk Rating Methodology` em todos os 14 prompts de segurança.
+
 ## [1.8.0] - 2026-09-10
 
 ### Adicionado & Aprimorado (Cobertura Completa do OWASP Top 10 Proactive Controls 2024)
